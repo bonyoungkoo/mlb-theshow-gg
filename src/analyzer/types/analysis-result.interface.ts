@@ -43,6 +43,8 @@ export type AtBatResult =
   | 'walk'
   | 'strikeout'
   | 'out'
+  | 'sacrifice out'
+  | 'sacrifice fly out'
   | 'error'
   | 'unknown';
 

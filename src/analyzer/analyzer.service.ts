@@ -54,7 +54,7 @@ export class AnalyzerService {
         `🚦 주자상태:`,
         Object.fromEntries(combined.runnersBefore || []),
       );
-      console.log(`=================`);
+      console.log(`===========================================`);
 
       atBats.push(combined);
     }
@@ -121,7 +121,7 @@ export class AnalyzerService {
           const cleaned = sentence.replace(/^\^+/, '').trim();
 
           const match = cleaned.match(
-            /^([A-Za-z\s\-'.]+)\s+(lined|grounded|flied|popped|struck|walked|hit|reached|homered|sacrificed|was called|doubled|tripled|singled|singled|bunted|hit by)/i,
+            /^([A-Za-z\s\-'.]+?)\s+(?:grounded out|lined out|flied out|popped out|struck out|was called out|struck|lined|grounded|flied|popped|walked|hit|reached|homered|sacrificed|was called|doubled|tripled|singled|bunted|hit by)/i,
           );
 
           if (match) {
@@ -145,8 +145,14 @@ export class AnalyzerService {
               `🆕 타석 추가됨(강제 분리): ${currentAtBat.batter} →`,
               currentAtBat.log,
             );
+
+            const forcedMatch = cleaned.match(
+              /^\*?\s*\^*\s*([A-Za-z\s\-'.]+)\s+(lined|grounded|flied|popped|struck|walked|hit|reached|homered|sacrificed|was called|doubled|tripled|singled|bunted|hit by)/i,
+            );
+            const forcedName = forcedMatch ? forcedMatch[1].trim() : 'Unknown';
+
             currentAtBat = {
-              batter: 'Unknown', // 이후 match에서 대체되도록 처리
+              batter: forcedName,
               inning,
               isTopInning,
               log: [cleaned],
@@ -156,7 +162,12 @@ export class AnalyzerService {
           }
         }
 
-        if (currentAtBat) {
+        if (
+          currentAtBat &&
+          currentAtBat.log.every((line) => line.trim() === '')
+        ) {
+          console.log('🗑️ 마지막 빈 타석 제거');
+        } else if (currentAtBat) {
           atBats.push(currentAtBat);
           console.log(
             `🆕 마지막 타석 추가됨: ${currentAtBat.batter} →`,
@@ -271,9 +282,14 @@ export class AnalyzerService {
     )
       return 'single';
     if (description.includes('walked')) return 'walk';
+    if (description.includes('strikes')) return 'strikeout';
     if (description.includes('struck')) return 'strikeout';
+    if (description.includes('grounded out')) return 'out';
+    if (description.includes('lined out')) return 'out';
     if (description.includes('flied') || description.includes('popped'))
       return 'out';
+    if (description.includes('sacrificed to')) return 'sacrifice out';
+    if (description.includes('sacrifice fly')) return 'sacrifice fly out';
     return 'unknown';
   }
 
