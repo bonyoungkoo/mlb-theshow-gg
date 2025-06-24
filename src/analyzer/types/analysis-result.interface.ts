@@ -43,20 +43,24 @@ export type AtBatResult =
   | 'walk'
   | 'strikeout'
   | 'out'
+  | 'error'
   | 'unknown';
 
 export interface AtBatEvent {
   batter: string;
-  result: AtBatResult;
-  rbi: number;
-  description: string;
-  runnersBefore: Map<string, number>; // 이름 기준 루상 상태
-  risp: boolean; // 득점권 여부
+  result?: AtBatResult;
+  rbi?: number;
+  description?: string;
+  risp?: boolean;
+  runnersBefore?: Map<string, number>;
+  inning: number;
+  isTopInning: boolean;
+  log: string[];
 }
 
 export interface Ownership {
-  my: AtBatEvent[];
-  friend: AtBatEvent[];
+  myAtBats: AtBatEvent[];
+  friendAtBats: AtBatEvent[];
 }
 
 export interface ValidationResult {

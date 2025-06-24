@@ -12,17 +12,53 @@ import {
 
 @Injectable()
 export class AnalyzerService {
-  analyze({ line_score, game_log, box_score }: AnalyzeGameDto): AnalysisResult {
-    const result = this.analyzeFromLogs(line_score, game_log, box_score);
-    return result;
-  }
+  analyze({ line_score, game_log }: AnalyzeGameDto): AnalysisResult {
+    console.log('🧠 분석 시작');
 
-  private analyzeFromLogs(
-    line_score: any,
-    game_log: any,
-    box_score: any,
-  ): AnalysisResult {
-    const atBats = this.parseAtBats(game_log);
+    const gameLogLines = Array.isArray(game_log)
+      ? game_log
+      : game_log
+          .split(/\r?\n/)
+          .map((line) => line.trim())
+          .filter(Boolean);
+
+    console.log('📄 줄 수:', gameLogLines.length);
+
+    const rawAtBats = this.parseAtBats(gameLogLines);
+    const runnerMap = new Map<string, number>();
+    let outs = 0;
+
+    const atBats: AtBatEvent[] = [];
+
+    for (const raw of rawAtBats) {
+      const analyzed = this.analyzeAtBat(
+        raw.batter,
+        raw.log,
+        new Map(runnerMap),
+      );
+      const outsThisAB = this.updateRunnersWithTracking(
+        raw.log,
+        raw.batter,
+        runnerMap,
+      );
+      outs += outsThisAB;
+      const combined = { ...raw, ...analyzed };
+
+      console.log(`📌 타석 분석됨:`);
+      console.log(`👤 타자: ${combined.batter}`);
+      console.log(`📄 로그:`, combined.log);
+      console.log(`🏷️ 결과: ${combined.result}`);
+      console.log(`🎯 RBI: ${combined.rbi}`);
+      console.log(`⚾ RISP: ${combined.risp}`);
+      console.log(
+        `🚦 주자상태:`,
+        Object.fromEntries(combined.runnersBefore || []),
+      );
+      console.log(`=================`);
+
+      atBats.push(combined);
+    }
+
     const ownership = this.assignBatterOwnership(atBats);
     const myStats = this.aggregateStats(ownership.myAtBats);
     const friendStats = this.aggregateStats(ownership.friendAtBats);
@@ -32,6 +68,8 @@ export class AnalyzerService {
       friendStats,
     );
 
+    console.log(`🧾 검산 결과:`, validation);
+
     return {
       myStats,
       friendStats,
@@ -39,108 +77,121 @@ export class AnalyzerService {
     };
   }
 
-  private parseAtBats(gameLog: string): AtBatEvent[] {
-    const lines = gameLog.split('^n^');
+  private parseAtBats(gameLog: string[]): AtBatEvent[] {
     const atBats: AtBatEvent[] = [];
-    const runnerMap: Map<string, number> = new Map();
+    let inning = 1;
+    let isTopInning = true;
 
-    // 1. ROLLERS batting 구간만 추출
-    const rollerLines: string[] = [];
-    let include = false;
-    for (const line of lines) {
-      if (line.includes('ROLLERS batting')) {
-        include = true;
-        rollerLines.push(line.trim());
+    console.log('🎬 parseAtBats 시작');
+
+    const batterStartRegex =
+      /^([A-Za-z\s\-'.]+)\s+(popped|flied|grounded|struck|lined|hit|reached|homered|walked|doubled|tripled|sacrificed|was called)/i;
+
+    for (let i = 0; i < gameLog.length; i++) {
+      const line = gameLog[i].trim();
+
+      if (line.includes('Game Log Legend')) {
+        console.log('🛑 Game Log Legend 줄 스킵');
+        break;
+      }
+
+      if (line.startsWith('Inning')) {
+        const match = line.match(/Inning (\d+)/);
+        if (match) {
+          inning = parseInt(match[1], 10);
+          isTopInning = true;
+          console.log(`🕰️ 이닝 갱신: ${inning}회초`);
+        }
         continue;
       }
-      if (line.includes('Smackas batting')) {
-        include = false;
-        continue;
-      }
-      if (include) rollerLines.push(line.trim());
-    }
 
-    console.log('📄 ROLLERS batting log 추출:', rollerLines);
+      if (line.includes('ROLLERS batting.')) {
+        isTopInning = false;
+        console.log(`🎯 ROLLERS 시작 줄 발견: ${line}`);
 
-    // 2. 줄 단위로 문장 분해 및 필터링
-    const rawSentences = rollerLines
-      .flatMap((line) =>
-        line
-          .replace(/\^c\d+\^|\^e\^/g, '')
+        const sentences = line
+          .replace(/^.*?batting\./, '')
           .split('.')
-          .map((p) => p.trim())
-          .filter(Boolean),
-      )
-      .filter(
-        (sentence) =>
-          !/^ROLLERS batting|^Smackas batting|^.*pitching/i.test(sentence),
-      );
+          .map((s) => s.trim())
+          .filter(Boolean);
 
-    console.log('📌 분리된 문장 수:', rawSentences.length);
-    console.log('📄 첫 5문장:', rawSentences.slice(0, 5));
+        let currentAtBat: AtBatEvent | null = null;
 
-    const batterActionPattern =
-      /^([A-Z][a-z]+) (homered|doubled|tripled|singled|walked|grounded|flied|struck|lined|popped|hit|reached)/;
+        for (const sentence of sentences) {
+          const cleaned = sentence.replace(/^\^+/, '').trim();
 
-    let currentAtBat: string[] = [];
-    for (const sentence of rawSentences) {
-      const isNewAtBat = batterActionPattern.test(sentence);
-
-      if (isNewAtBat) {
-        if (currentAtBat.length > 0) {
-          const batter = this.extractBatterName(currentAtBat[0]);
-          const event = this.analyzeAtBat(
-            batter,
-            currentAtBat,
-            new Map(runnerMap),
+          const match = cleaned.match(
+            /^([A-Za-z\s\-'.]+)\s+(lined|grounded|flied|popped|struck|walked|hit|reached|homered|sacrificed|was called|doubled|tripled|singled|singled|bunted|hit by)/i,
           );
-          atBats.push(event);
-          this.updateRunnersWithTracking(currentAtBat, batter, runnerMap);
-          console.log('🧾 타석 분석 완료:', event);
+
+          if (match) {
+            if (currentAtBat) {
+              atBats.push(currentAtBat);
+              console.log(
+                `🆕 타석 추가됨: ${currentAtBat.batter} →`,
+                currentAtBat.log,
+              );
+            }
+            currentAtBat = {
+              batter: match[1].trim(),
+              inning,
+              isTopInning,
+              log: [cleaned],
+            };
+          } else if (sentence.startsWith('^') && currentAtBat) {
+            // ^로 시작했는데 매치 안 되는 경우: 이전 타석 종료 + 새로운 타석 시작 가능성
+            atBats.push(currentAtBat);
+            console.log(
+              `🆕 타석 추가됨(강제 분리): ${currentAtBat.batter} →`,
+              currentAtBat.log,
+            );
+            currentAtBat = {
+              batter: 'Unknown', // 이후 match에서 대체되도록 처리
+              inning,
+              isTopInning,
+              log: [cleaned],
+            };
+          } else if (currentAtBat) {
+            currentAtBat.log.push(cleaned);
+          }
         }
 
-        console.log('🆕 새 타석 시작');
-        console.log('👤 타자:', this.extractBatterName(sentence));
-        currentAtBat = [sentence];
-      } else {
-        currentAtBat.push(sentence);
+        if (currentAtBat) {
+          atBats.push(currentAtBat);
+          console.log(
+            `🆕 마지막 타석 추가됨: ${currentAtBat.batter} →`,
+            currentAtBat.log,
+          );
+        }
+      }
+
+      if (line.includes('Smackas batting.')) {
+        isTopInning = true;
+        continue;
       }
     }
 
-    // 마지막 타석 처리
-    if (currentAtBat.length > 0) {
-      console.log('🪵 마지막 타석:', currentAtBat);
-      const batter = this.extractBatterName(currentAtBat[0]);
-      const event = this.analyzeAtBat(batter, currentAtBat, new Map(runnerMap));
-      atBats.push(event);
-      this.updateRunnersWithTracking(currentAtBat, batter, runnerMap);
-      console.log('⚾ 마지막 분석 결과:', event);
-    }
-
+    console.log(`📊 총 타석 수: ${atBats.length}`);
     return atBats;
-  }
-
-  private extractBatterName(line: string): string {
-    // 맨 앞 단어를 타자 이름으로 추정
-    const match = line.match(/^([A-Z][a-zA-Z'-.]+)/);
-    return match ? match[1] : 'UNKNOWN';
   }
 
   private analyzeAtBat(
     batter: string,
     atBatLog: string[],
     runnerMap: Map<string, number>,
-  ): AtBatEvent {
+  ): Omit<AtBatEvent, 'batter' | 'inning' | 'isTopInning' | 'log'> {
     const result = this.inferResult(atBatLog[0]);
-    const rbi = this.countRBI(atBatLog);
-    const runnersBefore = new Map(runnerMap); // 복사본 저장
+    const rbi =
+      result === 'home_run'
+        ? this.countRBI(atBatLog) + 1
+        : this.countRBI(atBatLog);
+
+    const runnersBefore = new Map(runnerMap);
     const risp = this.isRISP(runnersBefore);
 
     return {
-      batter,
       result,
       rbi,
-      description: atBatLog[0],
       risp,
       runnersBefore,
     };
@@ -150,7 +201,11 @@ export class AnalyzerService {
     atBatLog: string[],
     batter: string,
     runnerMap: Map<string, number>,
-  ): void {
+  ): number {
+    let outsThisAtBat = 0;
+
+    const normalize = (name: string) => name.trim().replace(/\s+/g, ' ');
+
     for (const line of atBatLog) {
       const advanceMatch = line.match(
         /([A-Za-z\-'. ]+) advances to (1st|2nd|3rd|home)/,
@@ -159,35 +214,40 @@ export class AnalyzerService {
       const outMatch = line.match(/([A-Za-z\-'. ]+) out at (1st|2nd|3rd|home)/);
 
       if (advanceMatch) {
-        const name = advanceMatch[1].trim();
+        const name = normalize(advanceMatch[1]);
         const base = this.baseToNumber(advanceMatch[2]);
         runnerMap.set(name, base);
       }
 
       if (scoreMatch) {
-        const name = scoreMatch[1].trim();
+        const name = normalize(scoreMatch[1]);
         runnerMap.delete(name);
       }
 
       if (outMatch) {
-        const name = outMatch[1].trim();
+        const name = normalize(outMatch[1]);
         runnerMap.delete(name);
+        outsThisAtBat++;
+      }
+
+      if (
+        line.includes('flied out') ||
+        line.includes('popped out') ||
+        line.includes('grounded out') ||
+        line.includes('struck out')
+      ) {
+        outsThisAtBat++;
       }
     }
 
-    // 타자 진루 (단순화)
     const hitResult = this.inferResult(atBatLog[0]);
-    if (hitResult === 'single') {
-      runnerMap.set(batter, 1);
-    } else if (hitResult === 'double') {
-      runnerMap.set(batter, 2);
-    } else if (hitResult === 'triple') {
-      runnerMap.set(batter, 3);
-    } else if (hitResult === 'home_run') {
-      runnerMap.delete(batter); // 홈런이면 주자 제거
-    } else if (hitResult === 'walk') {
-      runnerMap.set(batter, 1); // 간단 처리
-    }
+    if (hitResult === 'single') runnerMap.set(normalize(batter), 1);
+    else if (hitResult === 'double') runnerMap.set(normalize(batter), 2);
+    else if (hitResult === 'triple') runnerMap.set(normalize(batter), 3);
+    else if (hitResult === 'home_run') runnerMap.delete(normalize(batter));
+    else if (hitResult === 'walk') runnerMap.set(normalize(batter), 1);
+
+    return outsThisAtBat;
   }
 
   private isRISP(runnerMap: Map<string, number>): boolean {
@@ -201,11 +261,13 @@ export class AnalyzerService {
     if (description.includes('homered')) return 'home_run';
     if (description.includes('tripled')) return 'triple';
     if (description.includes('doubled')) return 'double';
+    if (description.includes('error')) return 'error';
     if (
       description.includes('singled') ||
       description.includes('lined to') ||
       description.includes('grounded to') ||
-      description.includes('reached')
+      description.includes('reached') ||
+      (description.includes('hit to') && description.includes('for a single'))
     )
       return 'single';
     if (description.includes('walked')) return 'walk';
@@ -223,129 +285,124 @@ export class AnalyzerService {
     if (base === '1st') return 1;
     if (base === '2nd') return 2;
     if (base === '3rd') return 3;
-    return 4; // home
+    return 4;
   }
 
-  private aggregateStats(atBats: AtBatEvent[]): BatterStats {
-    let atBatsCount = 0;
-    let hits = 0;
-    let homeRuns = 0;
-    let rbis = 0;
-    let walks = 0;
-    let strikeouts = 0;
-    let totalBases = 0;
-
-    // RISP 계산
-    let rispAtBats = 0;
-    let rispHits = 0;
-
-    for (const ab of atBats) {
-      const { result, risp } = ab;
-
-      if (result === 'walk') {
-        walks++;
-        continue; // 타수 제외
-      }
-
-      if (result === 'strikeout') strikeouts++;
-      else if (['single', 'double', 'triple', 'home_run'].includes(result))
-        hits++;
-
-      if (result === 'home_run') {
-        homeRuns++;
-        totalBases += 4;
-      } else if (result === 'triple') {
-        totalBases += 3;
-      } else if (result === 'double') {
-        totalBases += 2;
-      } else if (result === 'single') {
-        totalBases += 1;
-      }
-
-      atBatsCount++;
-      rbis += ab.rbi;
-
-      // 득점권 타율 계산
-      if (risp) {
-        rispAtBats++;
-        if (['single', 'double', 'triple', 'home_run'].includes(result)) {
-          rispHits++;
-        }
-      }
-    }
-
-    const average = atBatsCount ? hits / atBatsCount : 0;
-    const obp =
-      atBatsCount + walks ? (hits + walks) / (atBatsCount + walks) : 0;
-    const slg = atBatsCount ? totalBases / atBatsCount : 0;
-    const ops = obp + slg;
-    const rispAverage = rispAtBats ? rispHits / rispAtBats : 0;
-
-    return {
-      atBats: atBatsCount,
-      hits,
-      homeRuns,
-      rbis,
-      walks,
-      strikeouts,
-      average,
-      obp,
-      slg,
-      ops,
-      rispAtBats,
-      rispHits,
-      rispAverage,
-    };
-  }
-
-  private assignBatterOwnership(atBats: AtBatEvent[]): {
-    myAtBats: AtBatEvent[];
-    friendAtBats: AtBatEvent[];
-  } {
+  private assignBatterOwnership(atBats: AtBatEvent[]): Ownership {
     const myAtBats: AtBatEvent[] = [];
     const friendAtBats: AtBatEvent[] = [];
 
-    let batterIndex = 0;
+    let isMyTurn = true;
+    let turnCount = 0;
 
     for (const atBat of atBats) {
-      const turn = Math.floor(batterIndex / 9); // 0부터 시작, 타순 바퀴 수
-      const inTurnIndex = batterIndex % 9; // 현재 바퀴 내 순번
+      const owner = isMyTurn ? myAtBats : friendAtBats;
+      owner.push(atBat);
+      turnCount++;
 
-      // 바퀴의 시작자가 누구냐에 따라 순서 계산
-      const isMyTurn =
-        (turn % 2 === 0 && inTurnIndex % 2 === 0) ||
-        (turn % 2 === 1 && inTurnIndex % 2 === 1);
-
-      if (isMyTurn) {
-        myAtBats.push(atBat);
+      if (turnCount % 9 === 0) {
+        isMyTurn = !isMyTurn;
       } else {
-        friendAtBats.push(atBat);
+        isMyTurn = !isMyTurn;
       }
-
-      batterIndex++;
     }
 
     return { myAtBats, friendAtBats };
   }
 
-  validateWithLineScore(
-    line_score: any,
-    myStats: StatLine,
-    friendStats: StatLine,
-  ) {
-    const expectedHits = parseInt(line_score.home_hits);
-    const expectedRuns = parseInt(line_score.home_runs);
+  private aggregateStats(atBats: AtBatEvent[]): BatterStats {
+    const stats = {
+      atBats: 0,
+      hits: 0,
+      homeRuns: 0,
+      rbis: 0,
+      walks: 0,
+      strikeouts: 0,
+      average: 0,
+      obp: 0,
+      slg: 0,
+      ops: 0,
+      rispAtBats: 0,
+      rispHits: 0,
+      rispAverage: 0,
+    };
 
+    for (const ab of atBats) {
+      if (ab.result !== 'walk') stats.atBats++;
+      if (
+        ab.result === 'single' ||
+        ab.result === 'double' ||
+        ab.result === 'triple' ||
+        ab.result === 'home_run'
+      )
+        stats.hits++;
+      if (ab.result === 'home_run') stats.homeRuns++;
+      if (ab.result === 'walk') stats.walks++;
+      if (ab.result === 'strikeout') stats.strikeouts++;
+      stats.rbis += ab.rbi ?? 0;
+
+      if (ab.risp) {
+        stats.rispAtBats++;
+        if (
+          ab.result === 'single' ||
+          ab.result === 'double' ||
+          ab.result === 'triple' ||
+          ab.result === 'home_run'
+        ) {
+          stats.rispHits++;
+        }
+      }
+    }
+
+    stats.average = stats.atBats ? +(stats.hits / stats.atBats).toFixed(3) : 0;
+    stats.obp =
+      stats.atBats + stats.walks
+        ? +((stats.hits + stats.walks) / (stats.atBats + stats.walks)).toFixed(
+            3,
+          )
+        : 0;
+    stats.slg = stats.atBats
+      ? +(
+          atBats.reduce((acc, ab) => {
+            if (ab.result === 'single') return acc + 1;
+            if (ab.result === 'double') return acc + 2;
+            if (ab.result === 'triple') return acc + 3;
+            if (ab.result === 'home_run') return acc + 4;
+            return acc;
+          }, 0) / stats.atBats
+        ).toFixed(3)
+      : 0;
+    stats.ops = +(stats.obp + stats.slg).toFixed(3);
+    stats.rispAverage = stats.rispAtBats
+      ? +(stats.rispHits / stats.rispAtBats).toFixed(3)
+      : 0;
+
+    return stats;
+  }
+
+  private validateWithLineScore(
+    lineScore: any,
+    myStats: BatterStats,
+    friendStats: BatterStats,
+  ): ValidationResult {
+    const isRollersAway = lineScore.away_name === 'ROLLERS';
+
+    const expectedHits = parseInt(
+      isRollersAway ? lineScore.away_hits : lineScore.home_hits,
+    );
+    const expectedRuns = parseInt(
+      isRollersAway ? lineScore.away_runs : lineScore.home_runs,
+    );
     const actualHits = myStats.hits + friendStats.hits;
     const actualRuns = myStats.rbis + friendStats.rbis;
 
     return {
-      hitsMatch: expectedHits === actualHits,
-      runsMatch: expectedRuns === actualRuns,
       expectedHits,
       actualHits,
       expectedRuns,
       actualRuns,
+      hitsMatch: expectedHits === actualHits,
+      runsMatch: expectedRuns === actualRuns,
     };
   }
 }
