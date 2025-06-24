@@ -1,0 +1,415 @@
+📄 ROLLERS batting log 추출: [
+  'ROLLERS batting. Leiter pitching. Raines popped out to Mauer (P2). Rutschman lined to center for a single. Castro flied out to Wood (F7). Santander flied out to Carter (F8).',
+  'Runs: 0 Hits: 1 Walks: 0 Errors: 0 Pitches: 14 Runners Left On: 1',
+  '',
+  '^c51^Inning 2:^c50^',
+  'ROLLERS batting. Roberts struck out chasing a low changeup. Marte was called out on strikes looking on a sinker high and in. Gordon doubled to center. ^c46^Neto grounded to center for a single. Gordon scores. Neto advances to 2nd.^c50^* ^c48^Carter doubled to left. Neto scores. ^c50^Raines grounded out to Castro (6-3).',
+  'Runs: 2 Hits: 3 Walks: 0 Errors: 0 Pitches: 24 Runners Left On: 1',
+  '',
+  '^c51^Inning 3:^c50^',
+  'ROLLERS batting. Rutschman flied out to Harper (F9). Castro struck out swinging late at a sinker low and away. Santander struck out swinging late at a sinker low and in.',
+  'Runs: 0 Hits: 0 Walks: 0 Errors: 0 Pitches: 10 Runners Left On: 0',
+  '',
+  '^c51^Inning 4:^c50^',
+  'ROLLERS batting. Roberts grounded to right for a single. ^c48^Marte doubled to right. Roberts scores. ^c50^Gordon sacrificed to Gelof (4-3 SH). Marte advances to 3rd. ^c48^Neto hit a sacrifice fly to Harper (SF9). Marte scores. ^c50^Carter struck out on a slider low and away.',
+  'Runs: 2 Hits: 2 Walks: 0 Errors: 0 Pitches: 9 Runners Left On: 0',
+  '',
+  '^c51^Inning 5:^c50^',
+  'ROLLERS batting. Raines grounded out to Devers (5-3). Rutschman lined to right for a single. Castro grounded to left for a single. Rutschman advances to 2nd. ^c48^Santander homered to right (386 feet). Rutschman scores. Castro scores. ^c50^Roberts struck out chasing a slider low and in. Marte lined out to Gelof (L4).',
+  'Runs: 3 Hits: 3 Walks: 0 Errors: 0 Pitches: 16 Runners Left On: 0',
+  '',
+  '^c51^Inning 6:^c50^',
+  'ROLLERS batting. Gordon reached first on a fielding error by Devers (E5). Neto grounded to right for a single. Gordon advances to 2nd. Carter sacrificed to Leiter (1-3 SH). Gordon advances to 3rd. Neto advances to 2nd. Raines walked. ^c48^Rutschman grounded out to Gelof on a deflected hit (4-3). Gordon scores. Neto advances to 3rd. Raines advances to 2nd. ^c50^^c48^Castro hit to center for a single. Neto scores. Raines scores. Castro advances to 3rd. ^c50^',
+  'Runs: 3 Hits: 2 Walks: 1 Errors: 1 Pitches: 12',
+  '',
+  'Game Log Legend',
+  '^c46^Critical Play',
+  '^c48^Run Scored',
+  '^c47^Critical Situation',
+  '^c49^Simulated Play',
+  '^c50^* Go-Ahead Play',
+  '',
+  'Coors Field^e^ (5280 ft elevation)',
+  'Hitting Difficulty is All-Star.',
+  'Pitching Difficulty is All-Star.',
+  '2025 Online Game',
+  'Maximum attendance: 36,790 (73% capacity)',
+  'Weather: 69 degrees, Overcast',
+  'No Wind',
+  'Scheduled First Pitch: 7:00pm',
+  'Game Scores: 77 (Donaldson), 20 (Leiter)',
+  '',
+  'UMPIRES',
+  'HP: Carl Dixon. 1B: Eric Summersgill. 2B: Freddie Ferguson. 3B: Joe MacDonald.',
+  ''
+]
+📌 분리된 문장 수: 86
+📄 첫 5문장: [
+  'ROLLERS batting',
+  'Leiter pitching',
+  'Raines popped out to Mauer (P2)',
+  'Rutschman lined to center for a single',
+  'Castro flied out to Wood (F7)'
+]
+🧾 타석 분석 완료: {
+  batter: 'ROLLERS',
+  result: 'unknown',
+  rbi: 0,
+  description: 'ROLLERS batting',
+  risp: false,
+  runnersBefore: Map(0) {}
+}
+🆕 새 타석 시작
+👤 타자: Raines
+📄 타석 로그: [ 'Raines popped out to Mauer (P2)' ]
+🧾 타석 분석 완료: {
+  batter: 'Raines',
+  result: 'out',
+  rbi: 0,
+  description: 'Raines popped out to Mauer (P2)',
+  risp: false,
+  runnersBefore: Map(0) {}
+}
+🆕 새 타석 시작
+👤 타자: Rutschman
+📄 타석 로그: [ 'Rutschman lined to center for a single' ]
+🧾 타석 분석 완료: {
+  batter: 'Rutschman',
+  result: 'single',
+  rbi: 0,
+  description: 'Rutschman lined to center for a single',
+  risp: false,
+  runnersBefore: Map(0) {}
+}
+🆕 새 타석 시작
+👤 타자: Castro
+📄 타석 로그: [ 'Castro flied out to Wood (F7)' ]
+🧾 타석 분석 완료: {
+  batter: 'Castro',
+  result: 'out',
+  rbi: 0,
+  description: 'Castro flied out to Wood (F7)',
+  risp: false,
+  runnersBefore: Map(1) { 'Rutschman' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Santander
+📄 타석 로그: [ 'Santander flied out to Carter (F8)' ]
+🧾 타석 분석 완료: {
+  batter: 'Santander',
+  result: 'out',
+  rbi: 0,
+  description: 'Santander flied out to Carter (F8)',
+  risp: false,
+  runnersBefore: Map(1) { 'Rutschman' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Roberts
+📄 타석 로그: [ 'Roberts struck out chasing a low changeup' ]
+🧾 타석 분석 완료: {
+  batter: 'Roberts',
+  result: 'strikeout',
+  rbi: 0,
+  description: 'Roberts struck out chasing a low changeup',
+  risp: false,
+  runnersBefore: Map(1) { 'Rutschman' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Gordon
+📄 타석 로그: [ 'Gordon doubled to center' ]
+🧾 타석 분석 완료: {
+  batter: 'Gordon',
+  result: 'double',
+  rbi: 0,
+  description: 'Gordon doubled to center',
+  risp: false,
+  runnersBefore: Map(1) { 'Rutschman' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Neto
+📄 타석 로그: [ 'Neto grounded to center for a single' ]
+🧾 타석 분석 완료: {
+  batter: 'Neto',
+  result: 'single',
+  rbi: 2,
+  description: 'Neto grounded to center for a single',
+  risp: true,
+  runnersBefore: Map(2) { 'Rutschman' => 1, 'Gordon' => 2 }
+}
+🆕 새 타석 시작
+👤 타자: Raines
+📄 타석 로그: [ 'Raines grounded out to Castro (6-3)' ]
+🧾 타석 분석 완료: {
+  batter: 'Raines',
+  result: 'unknown',
+  rbi: 0,
+  description: 'Raines grounded out to Castro (6-3)',
+  risp: false,
+  runnersBefore: Map(2) { 'Rutschman' => 1, 'Neto' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Rutschman
+📄 타석 로그: [ 'Rutschman flied out to Harper (F9)' ]
+🧾 타석 분석 완료: {
+  batter: 'Rutschman',
+  result: 'out',
+  rbi: 0,
+  description: 'Rutschman flied out to Harper (F9)',
+  risp: false,
+  runnersBefore: Map(2) { 'Rutschman' => 1, 'Neto' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Castro
+📄 타석 로그: [ 'Castro struck out swinging late at a sinker low and away' ]
+🧾 타석 분석 완료: {
+  batter: 'Castro',
+  result: 'strikeout',
+  rbi: 0,
+  description: 'Castro struck out swinging late at a sinker low and away',
+  risp: false,
+  runnersBefore: Map(2) { 'Rutschman' => 1, 'Neto' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Santander
+📄 타석 로그: [ 'Santander struck out swinging late at a sinker low and in' ]
+🧾 타석 분석 완료: {
+  batter: 'Santander',
+  result: 'strikeout',
+  rbi: 0,
+  description: 'Santander struck out swinging late at a sinker low and in',
+  risp: false,
+  runnersBefore: Map(2) { 'Rutschman' => 1, 'Neto' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Roberts
+📄 타석 로그: [ 'Roberts grounded to right for a single' ]
+🧾 타석 분석 완료: {
+  batter: 'Roberts',
+  result: 'single',
+  rbi: 0,
+  description: 'Roberts grounded to right for a single',
+  risp: false,
+  runnersBefore: Map(2) { 'Rutschman' => 1, 'Neto' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Marte
+📄 타석 로그: [ 'Marte doubled to right' ]
+🧾 타석 분석 완료: {
+  batter: 'Marte',
+  result: 'double',
+  rbi: 1,
+  description: 'Marte doubled to right',
+  risp: false,
+  runnersBefore: Map(3) { 'Rutschman' => 1, 'Neto' => 1, 'Roberts' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Neto
+📄 타석 로그: [ 'Neto hit a sacrifice fly to Harper (SF9)' ]
+🧾 타석 분석 완료: {
+  batter: 'Neto',
+  result: 'unknown',
+  rbi: 1,
+  description: 'Neto hit a sacrifice fly to Harper (SF9)',
+  risp: true,
+  runnersBefore: Map(3) { 'Rutschman' => 1, 'Neto' => 1, 'Marte' => 2 }
+}
+🆕 새 타석 시작
+👤 타자: Carter
+📄 타석 로그: [ 'Carter struck out on a slider low and away' ]
+🧾 타석 분석 완료: {
+  batter: 'Carter',
+  result: 'strikeout',
+  rbi: 0,
+  description: 'Carter struck out on a slider low and away',
+  risp: false,
+  runnersBefore: Map(2) { 'Rutschman' => 1, 'Neto' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Raines
+📄 타석 로그: [ 'Raines grounded out to Devers (5-3)' ]
+🧾 타석 분석 완료: {
+  batter: 'Raines',
+  result: 'unknown',
+  rbi: 0,
+  description: 'Raines grounded out to Devers (5-3)',
+  risp: false,
+  runnersBefore: Map(2) { 'Rutschman' => 1, 'Neto' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Rutschman
+📄 타석 로그: [ 'Rutschman lined to right for a single' ]
+🧾 타석 분석 완료: {
+  batter: 'Rutschman',
+  result: 'single',
+  rbi: 0,
+  description: 'Rutschman lined to right for a single',
+  risp: false,
+  runnersBefore: Map(2) { 'Rutschman' => 1, 'Neto' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Castro
+📄 타석 로그: [ 'Castro grounded to left for a single' ]
+🧾 타석 분석 완료: {
+  batter: 'Castro',
+  result: 'single',
+  rbi: 0,
+  description: 'Castro grounded to left for a single',
+  risp: false,
+  runnersBefore: Map(2) { 'Rutschman' => 1, 'Neto' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Santander
+📄 타석 로그: [ 'Santander homered to right (386 feet)' ]
+🧾 타석 분석 완료: {
+  batter: 'Santander',
+  result: 'home_run',
+  rbi: 2,
+  description: 'Santander homered to right (386 feet)',
+  risp: true,
+  runnersBefore: Map(3) { 'Rutschman' => 2, 'Neto' => 1, 'Castro' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Roberts
+📄 타석 로그: [ 'Roberts struck out chasing a slider low and in' ]
+🧾 타석 분석 완료: {
+  batter: 'Roberts',
+  result: 'strikeout',
+  rbi: 0,
+  description: 'Roberts struck out chasing a slider low and in',
+  risp: false,
+  runnersBefore: Map(1) { 'Neto' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Marte
+📄 타석 로그: [ 'Marte lined out to Gelof (L4)' ]
+🧾 타석 분석 완료: {
+  batter: 'Marte',
+  result: 'unknown',
+  rbi: 0,
+  description: 'Marte lined out to Gelof (L4)',
+  risp: false,
+  runnersBefore: Map(1) { 'Neto' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Gordon
+📄 타석 로그: [ 'Gordon reached first on a fielding error by Devers (E5)' ]
+🧾 타석 분석 완료: {
+  batter: 'Gordon',
+  result: 'single',
+  rbi: 0,
+  description: 'Gordon reached first on a fielding error by Devers (E5)',
+  risp: false,
+  runnersBefore: Map(1) { 'Neto' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Neto
+📄 타석 로그: [ 'Neto grounded to right for a single' ]
+🧾 타석 분석 완료: {
+  batter: 'Neto',
+  result: 'single',
+  rbi: 0,
+  description: 'Neto grounded to right for a single',
+  risp: false,
+  runnersBefore: Map(2) { 'Neto' => 1, 'Gordon' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Raines
+📄 타석 로그: [ 'Raines walked' ]
+🧾 타석 분석 완료: {
+  batter: 'Raines',
+  result: 'walk',
+  rbi: 0,
+  description: 'Raines walked',
+  risp: true,
+  runnersBefore: Map(2) { 'Neto' => 1, 'Gordon' => 3 }
+}
+🆕 새 타석 시작
+👤 타자: Rutschman
+📄 타석 로그: [ 'Rutschman grounded out to Gelof on a deflected hit (4-3)' ]
+🧾 타석 분석 완료: {
+  batter: 'Rutschman',
+  result: 'unknown',
+  rbi: 1,
+  description: 'Rutschman grounded out to Gelof on a deflected hit (4-3)',
+  risp: true,
+  runnersBefore: Map(3) { 'Neto' => 1, 'Gordon' => 3, 'Raines' => 1 }
+}
+🆕 새 타석 시작
+👤 타자: Castro
+📄 타석 로그: [ 'Castro hit to center for a single' ]
+🪵 마지막 타석: [
+  'Castro hit to center for a single',
+  'Neto scores',
+  'Raines scores',
+  'Castro advances to 3rd',
+  'Runs: 3 Hits: 2 Walks: 1 Errors: 1 Pitches: 12',
+  'Game Log Legend',
+  'Critical Play',
+  'Run Scored',
+  'Critical Situation',
+  'Simulated Play',
+  '* Go-Ahead Play',
+  'Coors Field (5280 ft elevation)',
+  'Hitting Difficulty is All-Star',
+  'Pitching Difficulty is All-Star',
+  '2025 Online Game',
+  'Maximum attendance: 36,790 (73% capacity)',
+  'Weather: 69 degrees, Overcast',
+  'No Wind',
+  'Scheduled First Pitch: 7:00pm',
+  'Game Scores: 77 (Donaldson), 20 (Leiter)',
+  'UMPIRES',
+  'HP: Carl Dixon',
+  '1B: Eric Summersgill',
+  '2B: Freddie Ferguson',
+  '3B: Joe MacDonald'
+]
+🧍‍♂️ 마지막 타자 이름: Castro
+⚾ 마지막 분석 결과: {
+  batter: 'Castro',
+  result: 'unknown',
+  rbi: 2,
+  description: 'Castro hit to center for a single',
+  risp: true,
+  runnersBefore: Map(2) { 'Neto' => 3, 'Raines' => 2 }
+}
+{
+  myStats: {
+    atBats: 13,
+    hits: 5,
+    homeRuns: 0,
+    rbis: 3,
+    walks: 1,
+    strikeouts: 2,
+    average: 0.38461538461538464,
+    obp: 0.42857142857142855,
+    slg: 0.46153846153846156,
+    ops: 0.8901098901098901,
+    rispAtBats: 2,
+    rispHits: 0,
+    rispAverage: 0
+  },
+  friendStats: {
+    atBats: 13,
+    hits: 5,
+    homeRuns: 1,
+    rbis: 6,
+    walks: 0,
+    strikeouts: 3,
+    average: 0.38461538461538464,
+    obp: 0.38461538461538464,
+    slg: 0.6923076923076923,
+    ops: 1.0769230769230769,
+    rispAtBats: 3,
+    rispHits: 2,
+    rispAverage: 0.6666666666666666
+  },
+  validation: {
+    hitsMatch: false,
+    runsMatch: false,
+    expectedHits: 11,
+    actualHits: 10,
+    expectedRuns: 10,
+    actualRuns: 9
+  }
+}
