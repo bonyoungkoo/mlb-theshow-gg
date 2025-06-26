@@ -5,8 +5,8 @@ import {
   AtBatEvent,
   AtBatResult,
   BatterStats,
+  LineScore,
   Ownership,
-  StatLine,
   ValidationResult,
 } from './types/analysis-result.interface';
 
@@ -14,10 +14,9 @@ import {
 export class AnalyzerService {
   analyze({ line_score, game_log }: AnalyzeGameDto): AnalysisResult {
     console.log('🧠 분석 시작');
-
     const gameLogLines = Array.isArray(game_log)
-      ? game_log
-      : game_log
+      ? (game_log as string[])
+      : (game_log as string)
           .split(/\r?\n/)
           .map((line) => line.trim())
           .filter(Boolean);
@@ -36,12 +35,21 @@ export class AnalyzerService {
         raw.log,
         new Map(runnerMap),
       );
+
+      const outsBefore = outs;
       const outsThisAB = this.updateRunnersWithTracking(
         raw.log,
         raw.batter,
         runnerMap,
       );
       outs += outsThisAB;
+
+      if (outs >= 3) {
+        outs = 0;
+        runnerMap.clear();
+        console.log('🛎️ 3아웃 → 이닝 종료, 주자 초기화됨');
+      }
+
       const combined = { ...raw, ...analyzed };
 
       console.log(`📌 타석 분석됨:`);
@@ -50,6 +58,8 @@ export class AnalyzerService {
       console.log(`🏷️ 결과: ${combined.result}`);
       console.log(`🎯 RBI: ${combined.rbi}`);
       console.log(`⚾ RISP: ${combined.risp}`);
+      console.log(`🕰️ 이닝: ${raw.inning} (${raw.isTopInning ? '초' : '말'})`);
+      console.log(`❌ 아웃카운트: ${outsBefore}`);
       console.log(
         `🚦 주자상태:`,
         Object.fromEntries(combined.runnersBefore || []),
@@ -84,9 +94,6 @@ export class AnalyzerService {
 
     console.log('🎬 parseAtBats 시작');
 
-    const batterStartRegex =
-      /^([A-Za-z\s\-'.]+)\s+(popped|flied|grounded|struck|lined|hit|reached|homered|walked|doubled|tripled|sacrificed|was called)/i;
-
     for (let i = 0; i < gameLog.length; i++) {
       const line = gameLog[i].trim();
 
@@ -95,14 +102,12 @@ export class AnalyzerService {
         break;
       }
 
-      if (line.startsWith('Inning')) {
-        const match = line.match(/Inning (\d+)/);
+      if (/Inning \d+:/.test(line)) {
+        const match = line.match(/Inning (\d+):/);
         if (match) {
           inning = parseInt(match[1], 10);
-          isTopInning = true;
-          console.log(`🕰️ 이닝 갱신: ${inning}회초`);
+          console.log(`🕰️ 이닝 갱신: ${inning}회`);
         }
-        continue;
       }
 
       if (line.includes('ROLLERS batting.')) {
@@ -118,10 +123,21 @@ export class AnalyzerService {
         let currentAtBat: AtBatEvent | null = null;
 
         for (const sentence of sentences) {
-          const cleaned = sentence.replace(/^\^+/, '').trim();
+          const cleaned = sentence
+            .replace(/^\^*[^A-Za-z0-9]*\s*/, '') // ^, *, 공백류 모두 제거
+            .trim();
+
+          if (
+            /pitching\.?$/i.test(cleaned) || // .으로 끝나거나 안 끝나거나
+            /pinch hit for/i.test(cleaned) ||
+            /^Game Log Legend/i.test(cleaned)
+          ) {
+            console.log(`🚫 타석 아님(제외): ${cleaned}`);
+            continue;
+          }
 
           const match = cleaned.match(
-            /^([A-Za-z\s\-'.]+?)\s+(?:grounded out|lined out|flied out|popped out|struck out|was called out|struck|lined|grounded|flied|popped|walked|hit|reached|homered|sacrificed|was called|doubled|tripled|singled|bunted|hit by)/i,
+            /^([A-Za-z\s\-'.]+?)\s+(?:grounded out|lined out|flied out|popped out|struck out|was called out|struck|lined|grounded|flied|popped|walked|hit|reached|homered|sacrificed|was called|doubled|tripled|singled|bunted|hit by|was hit by|pinch hit)/i,
           );
 
           if (match) {
@@ -139,6 +155,11 @@ export class AnalyzerService {
               log: [cleaned],
             };
           } else if (sentence.startsWith('^') && currentAtBat) {
+            if (/^[A-Za-z\s\-'.]+ stole (2nd|3rd|home)/i.test(cleaned)) {
+              currentAtBat.log.push(cleaned);
+              continue;
+            }
+
             // ^로 시작했는데 매치 안 되는 경우: 이전 타석 종료 + 새로운 타석 시작 가능성
             atBats.push(currentAtBat);
             console.log(
@@ -218,45 +239,76 @@ export class AnalyzerService {
     const normalize = (name: string) => name.trim().replace(/\s+/g, ' ');
 
     for (const line of atBatLog) {
+      let isOut = false;
       const advanceMatch = line.match(
         /([A-Za-z\-'. ]+) advances to (1st|2nd|3rd|home)/,
       );
       const scoreMatch = line.match(/([A-Za-z\-'. ]+) scores/);
-      const outMatch = line.match(/([A-Za-z\-'. ]+) out at (1st|2nd|3rd|home)/);
+      const outMatch = line.match(
+        /([A-Za-z\-'. ]+)\s+out(?: at (1st|2nd|3rd|home))?/,
+      );
+      const pinchRunnerMatch = line.match(
+        /([A-Za-z\-'. ]+) pinch runs for ([A-Za-z\-'. ]+)/,
+      );
+      const stealMatch = line.match(/([A-Za-z\-'. ]+) stole (2nd|3rd|home)/);
 
       if (advanceMatch) {
         const name = normalize(advanceMatch[1]);
         const base = this.baseToNumber(advanceMatch[2]);
         runnerMap.set(name, base);
+        console.log(`➡️ ${name} advances to base ${base}`);
       }
 
       if (scoreMatch) {
         const name = normalize(scoreMatch[1]);
         runnerMap.delete(name);
+        console.log(`🏃 ${name} scores and removed from base`);
       }
 
       if (outMatch) {
         const name = normalize(outMatch[1]);
         runnerMap.delete(name);
-        outsThisAtBat++;
+        isOut = true;
+        // outsThisAtBat++;
+      }
+
+      if (pinchRunnerMatch) {
+        const name = normalize(pinchRunnerMatch[1]);
+        batter = name;
+      }
+
+      if (stealMatch) {
+        const name = normalize(stealMatch[1]);
+        const base = this.baseToNumber(stealMatch[2]);
+        runnerMap.set(name, base);
       }
 
       if (
         line.includes('flied out') ||
+        line.includes('lined out') ||
         line.includes('popped out') ||
+        line.includes('grounded into a double play') ||
         line.includes('grounded out') ||
+        line.includes('strikes') ||
+        line.includes('was called out') ||
+        line.includes('sacrificed to') ||
+        line.includes('sacrifice fly') ||
         line.includes('struck out')
       ) {
-        outsThisAtBat++;
+        isOut = true;
       }
+      if (isOut) outsThisAtBat++;
     }
 
     const hitResult = this.inferResult(atBatLog[0]);
-    if (hitResult === 'single') runnerMap.set(normalize(batter), 1);
-    else if (hitResult === 'double') runnerMap.set(normalize(batter), 2);
-    else if (hitResult === 'triple') runnerMap.set(normalize(batter), 3);
-    else if (hitResult === 'home_run') runnerMap.delete(normalize(batter));
-    else if (hitResult === 'walk') runnerMap.set(normalize(batter), 1);
+    const normalizedBatter = normalize(batter);
+
+    if (!runnerMap.has(normalizedBatter)) {
+      if (hitResult === 'single') runnerMap.set(normalizedBatter, 1);
+      else if (hitResult === 'double') runnerMap.set(normalizedBatter, 2);
+      else if (hitResult === 'triple') runnerMap.set(normalizedBatter, 3);
+      else if (hitResult === 'walk') runnerMap.set(normalizedBatter, 1);
+    }
 
     return outsThisAtBat;
   }
@@ -272,7 +324,13 @@ export class AnalyzerService {
     if (description.includes('homered')) return 'home_run';
     if (description.includes('tripled')) return 'triple';
     if (description.includes('doubled')) return 'double';
+    if (description.includes('grounded and deflected off')) {
+      if (description.includes('single')) return 'single';
+      if (description.includes('doubled')) return 'double';
+      if (description.includes('triple')) return 'triple';
+    }
     if (description.includes('error')) return 'error';
+    if (description.includes(`fielder's choice`)) return 'out';
     if (
       description.includes('singled') ||
       description.includes('lined to') ||
@@ -282,12 +340,15 @@ export class AnalyzerService {
     )
       return 'single';
     if (description.includes('walked')) return 'walk';
+    if (description.includes('hit by a pitch')) return 'walk';
     if (description.includes('strikes')) return 'strikeout';
     if (description.includes('struck')) return 'strikeout';
     if (description.includes('grounded out')) return 'out';
+    if (description.includes('grounded into a double play')) return 'out';
     if (description.includes('lined out')) return 'out';
-    if (description.includes('flied') || description.includes('popped'))
-      return 'out';
+    if (description.includes('was called out')) return 'out';
+    if (description.includes('flied out')) return 'out';
+    if (description.includes('popped out')) return 'out';
     if (description.includes('sacrificed to')) return 'sacrifice out';
     if (description.includes('sacrifice fly')) return 'sacrifice fly out';
     return 'unknown';
@@ -397,11 +458,11 @@ export class AnalyzerService {
   }
 
   private validateWithLineScore(
-    lineScore: any,
+    lineScore: LineScore,
     myStats: BatterStats,
     friendStats: BatterStats,
   ): ValidationResult {
-    const isRollersAway = lineScore.away_name === 'ROLLERS';
+    const isRollersAway = lineScore.away_full_name === 'ROLLERS';
 
     const expectedHits = parseInt(
       isRollersAway ? lineScore.away_hits : lineScore.home_hits,

@@ -97,3 +97,13 @@ export interface StatLine {
   rispHits: number;
   rispAverage: number;
 }
+
+export interface LineScore {
+  inning: string;
+  home_full_name: string;
+  away_full_name: string;
+  away_hits: string;
+  away_runs: string;
+  home_hits: string;
+  home_runs: string;
+}

@@ -1,409 +1,267 @@
 🧠 분석 시작
-📄 줄 수: 62
+📄 줄 수: 71
 🎬 parseAtBats 시작
-🎯 ROLLERS 시작 줄 발견: ^ROLLERS batting. Leiter pitching. Raines popped out to Mauer (P2). Rutschman lined to center for a single. Castro flied out to Wood (F7). Santander flied out to Carter (F8).
+🕰️ 이닝 갱신: 1회
+🎯 ROLLERS 시작 줄 발견: ^ROLLERS batting. Johnson pitching. Raines doubled to left. Roberts struck out swinging late at a high fastball. ^Castro homered to right (406 feet). Raines scores. ^Santander grounded out to Vientos (5-3). Dominguez popped out to Hodges (P3).
+🚫 타석 아님(제외): Johnson pitching
 🆕 타석 추가됨: Raines → [
-  "Raines popped out to Mauer (P2)"
+  "Raines doubled to left"
 ]
-🆕 타석 추가됨: Rutschman → [
-  "Rutschman lined to center for a single"
-]
-🆕 타석 추가됨: Castro → [
-  "Castro flied out to Wood (F7)"
-]
-🆕 마지막 타석 추가됨: Santander → [
-  "Santander flied out to Carter (F8)"
-]
-🎯 ROLLERS 시작 줄 발견: ^ROLLERS batting. Roberts struck out chasing a low changeup. Marte was called out on strikes looking on a sinker high and in. Gordon doubled to center. ^Neto grounded to center for a single. Gordon scores. Neto advances to 2nd.^* ^Carter doubled to left. Neto scores. ^Raines grounded out to Castro (6-3).
 🆕 타석 추가됨: Roberts → [
-  "Roberts struck out chasing a low changeup"
-]
-🆕 타석 추가됨: Marte → [
-  "Marte was called out on strikes looking on a sinker high and in"
-]
-🆕 타석 추가됨: Gordon → [
-  "Gordon doubled to center"
-]
-🆕 타석 추가됨(강제 분리): Neto → [
-  "Neto grounded to center for a single",
-  "Gordon scores",
-  "Neto advances to 2nd"
-]
-🆕 타석 추가됨: Carter → [
-  "* ^Carter doubled to left",
-  "Neto scores"
-]
-🆕 마지막 타석 추가됨: Raines → [
-  "Raines grounded out to Castro (6-3)"
-]
-🎯 ROLLERS 시작 줄 발견: ^ROLLERS batting. Rutschman flied out to Harper (F9). Castro struck out swinging late at a sinker low and away. Santander struck out swinging late at a sinker low and in.
-🆕 타석 추가됨: Rutschman → [
-  "Rutschman flied out to Harper (F9)"
+  "Roberts struck out swinging late at a high fastball"
 ]
 🆕 타석 추가됨: Castro → [
-  "Castro struck out swinging late at a sinker low and away"
-]
-🆕 마지막 타석 추가됨: Santander → [
-  "Santander struck out swinging late at a sinker low and in"
-]
-🎯 ROLLERS 시작 줄 발견: ^ROLLERS batting. Roberts grounded to right for a single. ^Marte doubled to right. Roberts scores. ^Gordon sacrificed to Gelof (4-3 SH). Marte advances to 3rd. ^Neto hit a sacrifice fly to Harper (SF9). Marte scores. ^Carter struck out on a slider low and away.
-🆕 타석 추가됨: Roberts → [
-  "Roberts grounded to right for a single"
-]
-🆕 타석 추가됨: Marte → [
-  "Marte doubled to right",
-  "Roberts scores"
-]
-🆕 타석 추가됨: Gordon → [
-  "Gordon sacrificed to Gelof (4-3 SH)",
-  "Marte advances to 3rd"
-]
-🆕 타석 추가됨: Neto → [
-  "Neto hit a sacrifice fly to Harper (SF9)",
-  "Marte scores"
-]
-🆕 마지막 타석 추가됨: Carter → [
-  "Carter struck out on a slider low and away"
-]
-🎯 ROLLERS 시작 줄 발견: ^ROLLERS batting. Raines grounded out to Devers (5-3). Rutschman lined to right for a single. Castro grounded to left for a single. Rutschman advances to 2nd. ^Santander homered to right (386 feet). Rutschman scores. Castro scores. ^Roberts struck out chasing a slider low and in. Marte lined out to Gelof (L4).
-🆕 타석 추가됨: Raines → [
-  "Raines grounded out to Devers (5-3)"
-]
-🆕 타석 추가됨: Rutschman → [
-  "Rutschman lined to right for a single"
-]
-🆕 타석 추가됨: Castro → [
-  "Castro grounded to left for a single",
-  "Rutschman advances to 2nd"
+  "Castro homered to right (406 feet)",
+  "Raines scores"
 ]
 🆕 타석 추가됨: Santander → [
-  "Santander homered to right (386 feet)",
-  "Rutschman scores",
-  "Castro scores"
+  "Santander grounded out to Vientos (5-3)"
+]
+🆕 마지막 타석 추가됨: Dominguez → [
+  "Dominguez popped out to Hodges (P3)"
+]
+🕰️ 이닝 갱신: 2회
+🎯 ROLLERS 시작 줄 발견: ^ROLLERS batting. ^Marte homered to left (439 feet).^* Sale pitching. Piazza lined to center for a single. Kurtz lined to right for a single. Piazza advances to 3rd. ^Hernandez hit a sacrifice fly to Carroll (SF8). Piazza scores. ^^Raines homered to left (421 feet). Kurtz scores. ^Roberts struck out chasing a slider low and in. Castro lined out to Hodges (L3).
+🚫 타석 아님(제외): Sale pitching
+🆕 타석 추가됨: Marte → [
+  "Marte homered to left (439 feet)"
+]
+🆕 타석 추가됨: Piazza → [
+  "Piazza lined to center for a single"
+]
+🆕 타석 추가됨: Kurtz → [
+  "Kurtz lined to right for a single",
+  "Piazza advances to 3rd"
+]
+🆕 타석 추가됨: Hernandez → [
+  "Hernandez hit a sacrifice fly to Carroll (SF8)",
+  "Piazza scores"
+]
+🆕 타석 추가됨: Raines → [
+  "Raines homered to left (421 feet)",
+  "Kurtz scores"
 ]
 🆕 타석 추가됨: Roberts → [
   "Roberts struck out chasing a slider low and in"
 ]
-🆕 마지막 타석 추가됨: Marte → [
-  "Marte lined out to Gelof (L4)"
+🆕 마지막 타석 추가됨: Castro → [
+  "Castro lined out to Hodges (L3)"
 ]
-🎯 ROLLERS 시작 줄 발견: ^ROLLERS batting. Gordon reached first on a fielding error by Devers (E5). Neto grounded to right for a single. Gordon advances to 2nd. Carter sacrificed to Leiter (1-3 SH). Gordon advances to 3rd. Neto advances to 2nd. Raines walked. ^Rutschman grounded out to Gelof on a deflected hit (4-3). Gordon scores. Neto advances to 3rd. Raines advances to 2nd. ^^Castro hit to center for a single. Neto scores. Raines scores. Castro advances to 3rd. ^
-🆕 타석 추가됨: Gordon → [
-  "Gordon reached first on a fielding error by Devers (E5)"
+🕰️ 이닝 갱신: 3회
+🎯 ROLLERS 시작 줄 발견: ^ROLLERS batting. ^Santander homered to right (399 feet). ^Milner pitching. Dominguez grounded out to Vientos (5-3). Marte popped out to Dozier (P4). Piazza grounded out to Hodges (3U).
+🚫 타석 아님(제외): Milner pitching
+🆕 타석 추가됨: Santander → [
+  "Santander homered to right (399 feet)"
 ]
-🆕 타석 추가됨: Neto → [
-  "Neto grounded to right for a single",
-  "Gordon advances to 2nd"
+🆕 타석 추가됨: Dominguez → [
+  "Dominguez grounded out to Vientos (5-3)"
 ]
-🆕 타석 추가됨: Carter → [
-  "Carter sacrificed to Leiter (1-3 SH)",
-  "Gordon advances to 3rd",
-  "Neto advances to 2nd"
+🆕 타석 추가됨: Marte → [
+  "Marte popped out to Dozier (P4)"
+]
+🆕 마지막 타석 추가됨: Piazza → [
+  "Piazza grounded out to Hodges (3U)"
+]
+🕰️ 이닝 갱신: 4회
+🎯 ROLLERS 시작 줄 발견: ^ROLLERS batting. Kurtz grounded out to Dozier (4-3). Hernandez grounded to center for a single. Hjelle pitching. Raines lined out to Carter (L7). Roberts walked. Castro lined to left for a single. Hernandez advances to 3rd. Roberts advances to 2nd. Santander flied out to Carroll (F8).
+🆕 타석 추가됨: Kurtz → [
+  "Kurtz grounded out to Dozier (4-3)"
+]
+🚫 타석 아님(제외): Hjelle pitching
+🆕 타석 추가됨: Hernandez → [
+  "Hernandez grounded to center for a single"
 ]
 🆕 타석 추가됨: Raines → [
-  "Raines walked"
+  "Raines lined out to Carter (L7)"
 ]
-🆕 타석 추가됨: Rutschman → [
-  "Rutschman grounded out to Gelof on a deflected hit (4-3)",
-  "Gordon scores",
-  "Neto advances to 3rd",
-  "Raines advances to 2nd"
+🆕 타석 추가됨: Roberts → [
+  "Roberts walked"
 ]
-🆕 타석 추가됨(강제 분리): Castro → [
-  "Castro hit to center for a single",
-  "Neto scores",
-  "Raines scores",
-  "Castro advances to 3rd"
+🆕 타석 추가됨: Castro → [
+  "Castro lined to left for a single",
+  "Hernandez advances to 3rd",
+  "Roberts advances to 2nd"
 ]
-🗑️ 마지막 빈 타석 제거
+🆕 마지막 타석 추가됨: Santander → [
+  "Santander flied out to Carroll (F8)"
+]
+🕰️ 이닝 갱신: 5회
+🎯 ROLLERS 시작 줄 발견: ^ROLLERS batting. Dominguez grounded out to Smith (6-3). Marte doubled to right. Piazza struck out swinging late at an inside sinker. Kurtz flied out to Carter (F7).
+🆕 타석 추가됨: Dominguez → [
+  "Dominguez grounded out to Smith (6-3)"
+]
+🆕 타석 추가됨: Marte → [
+  "Marte doubled to right"
+]
+🆕 타석 추가됨: Piazza → [
+  "Piazza struck out swinging late at an inside sinker"
+]
+🆕 마지막 타석 추가됨: Kurtz → [
+  "Kurtz flied out to Carter (F7)"
+]
+🕰️ 이닝 갱신: 6회
+🎯 ROLLERS 시작 줄 발견: ^ROLLERS batting. O'Day pitching. Hernandez grounded out to Hodges (3U). Raines walked. Raines stole 2nd. Raines stole 3rd. ^Roberts reached first on fielder's choice (FC). Raines scores. ^Castro reached first on fielder's choice (4-6 FC). Roberts out. Santander lined out to Carroll (L8).
+🚫 타석 아님(제외): O'Day pitching
+🆕 타석 추가됨: Hernandez → [
+  "Hernandez grounded out to Hodges (3U)"
+]
+🆕 타석 추가됨: Raines → [
+  "Raines walked",
+  "Raines stole 2nd",
+  "Raines stole 3rd"
+]
+🆕 타석 추가됨: Roberts → [
+  "Roberts reached first on fielder's choice (FC)",
+  "Raines scores"
+]
+🆕 타석 추가됨: Castro → [
+  "Castro reached first on fielder's choice (4-6 FC)",
+  "Roberts out"
+]
+🆕 마지막 타석 추가됨: Santander → [
+  "Santander lined out to Carroll (L8)"
+]
+🕰️ 이닝 갱신: 7회
 🛑 Game Log Legend 줄 스킵
-📊 총 타석 수: 30
+📊 총 타석 수: 31
 📌 타석 분석됨:
 👤 타자: Raines
 📄 로그: [
-  "Raines popped out to Mauer (P2)"
+  "Raines doubled to left"
 ]
-🏷️ 결과: out
+🏷️ 결과: double
 🎯 RBI: 0
 ⚾ RISP: false
+🕰️ 이닝: 1 (말)
+❌ 아웃카운트: 0
 🚦 주자상태: {}
 ===========================================
 📌 타석 분석됨:
-👤 타자: Rutschman
+👤 타자: Roberts
 📄 로그: [
-  "Rutschman lined to center for a single"
+  "Roberts struck out swinging late at a high fastball"
 ]
-🏷️ 결과: single
+🏷️ 결과: strikeout
 🎯 RBI: 0
-⚾ RISP: false
-🚦 주자상태: {}
+⚾ RISP: true
+🕰️ 이닝: 1 (말)
+❌ 아웃카운트: 0
+🚦 주자상태: {
+  "Raines": 2
+}
 ===========================================
+🏃 Raines scores and removed from base
 📌 타석 분석됨:
 👤 타자: Castro
 📄 로그: [
-  "Castro flied out to Wood (F7)"
+  "Castro homered to right (406 feet)",
+  "Raines scores"
 ]
-🏷️ 결과: out
-🎯 RBI: 0
-⚾ RISP: false
+🏷️ 결과: home_run
+🎯 RBI: 2
+⚾ RISP: true
+🕰️ 이닝: 1 (말)
+❌ 아웃카운트: 1
 🚦 주자상태: {
-  "Rutschman": 1
+  "Raines": 2
 }
 ===========================================
 📌 타석 분석됨:
 👤 타자: Santander
 📄 로그: [
-  "Santander flied out to Carter (F8)"
+  "Santander grounded out to Vientos (5-3)"
 ]
 🏷️ 결과: out
 🎯 RBI: 0
 ⚾ RISP: false
-🚦 주자상태: {
-  "Rutschman": 1
-}
+🕰️ 이닝: 1 (말)
+❌ 아웃카운트: 1
+🚦 주자상태: {}
 ===========================================
+🛎️ 3아웃 → 이닝 종료, 주자 초기화됨
 📌 타석 분석됨:
-👤 타자: Roberts
+👤 타자: Dominguez
 📄 로그: [
-  "Roberts struck out chasing a low changeup"
+  "Dominguez popped out to Hodges (P3)"
 ]
-🏷️ 결과: strikeout
+🏷️ 결과: out
 🎯 RBI: 0
 ⚾ RISP: false
-🚦 주자상태: {
-  "Rutschman": 1
-}
+🕰️ 이닝: 1 (말)
+❌ 아웃카운트: 2
+🚦 주자상태: {}
 ===========================================
 📌 타석 분석됨:
 👤 타자: Marte
 📄 로그: [
-  "Marte was called out on strikes looking on a sinker high and in"
+  "Marte homered to left (439 feet)"
 ]
-🏷️ 결과: strikeout
-🎯 RBI: 0
-⚾ RISP: false
-🚦 주자상태: {
-  "Rutschman": 1
-}
-===========================================
-📌 타석 분석됨:
-👤 타자: Gordon
-📄 로그: [
-  "Gordon doubled to center"
-]
-🏷️ 결과: double
-🎯 RBI: 0
-⚾ RISP: false
-🚦 주자상태: {
-  "Rutschman": 1
-}
-===========================================
-📌 타석 분석됨:
-👤 타자: Neto
-📄 로그: [
-  "Neto grounded to center for a single",
-  "Gordon scores",
-  "Neto advances to 2nd"
-]
-🏷️ 결과: single
-🎯 RBI: 1
-⚾ RISP: true
-🚦 주자상태: {
-  "Rutschman": 1,
-  "Gordon": 2
-}
-===========================================
-📌 타석 분석됨:
-👤 타자: Carter
-📄 로그: [
-  "* ^Carter doubled to left",
-  "Neto scores"
-]
-🏷️ 결과: double
+🏷️ 결과: home_run
 🎯 RBI: 1
 ⚾ RISP: false
-🚦 주자상태: {
-  "Rutschman": 1,
-  "Neto": 1
-}
+🕰️ 이닝: 2 (말)
+❌ 아웃카운트: 0
+🚦 주자상태: {}
 ===========================================
 📌 타석 분석됨:
-👤 타자: Raines
+👤 타자: Piazza
 📄 로그: [
-  "Raines grounded out to Castro (6-3)"
-]
-🏷️ 결과: out
-🎯 RBI: 0
-⚾ RISP: true
-🚦 주자상태: {
-  "Rutschman": 1,
-  "Carter": 2
-}
-===========================================
-📌 타석 분석됨:
-👤 타자: Rutschman
-📄 로그: [
-  "Rutschman flied out to Harper (F9)"
-]
-🏷️ 결과: out
-🎯 RBI: 0
-⚾ RISP: true
-🚦 주자상태: {
-  "Rutschman": 1,
-  "Carter": 2
-}
-===========================================
-📌 타석 분석됨:
-👤 타자: Castro
-📄 로그: [
-  "Castro struck out swinging late at a sinker low and away"
-]
-🏷️ 결과: strikeout
-🎯 RBI: 0
-⚾ RISP: true
-🚦 주자상태: {
-  "Rutschman": 1,
-  "Carter": 2
-}
-===========================================
-📌 타석 분석됨:
-👤 타자: Santander
-📄 로그: [
-  "Santander struck out swinging late at a sinker low and in"
-]
-🏷️ 결과: strikeout
-🎯 RBI: 0
-⚾ RISP: true
-🚦 주자상태: {
-  "Rutschman": 1,
-  "Carter": 2
-}
-===========================================
-📌 타석 분석됨:
-👤 타자: Roberts
-📄 로그: [
-  "Roberts grounded to right for a single"
+  "Piazza lined to center for a single"
 ]
 🏷️ 결과: single
 🎯 RBI: 0
-⚾ RISP: true
-🚦 주자상태: {
-  "Rutschman": 1,
-  "Carter": 2
-}
+⚾ RISP: false
+🕰️ 이닝: 2 (말)
+❌ 아웃카운트: 0
+🚦 주자상태: {}
 ===========================================
+➡️ Piazza advances to base 3
 📌 타석 분석됨:
-👤 타자: Marte
+👤 타자: Kurtz
 📄 로그: [
-  "Marte doubled to right",
-  "Roberts scores"
+  "Kurtz lined to right for a single",
+  "Piazza advances to 3rd"
 ]
-🏷️ 결과: double
-🎯 RBI: 1
-⚾ RISP: true
-🚦 주자상태: {
-  "Rutschman": 1,
-  "Carter": 2,
-  "Roberts": 1
-}
-===========================================
-📌 타석 분석됨:
-👤 타자: Gordon
-📄 로그: [
-  "Gordon sacrificed to Gelof (4-3 SH)",
-  "Marte advances to 3rd"
-]
-🏷️ 결과: sacrifice out
+🏷️ 결과: single
 🎯 RBI: 0
-⚾ RISP: true
+⚾ RISP: false
+🕰️ 이닝: 2 (말)
+❌ 아웃카운트: 0
 🚦 주자상태: {
-  "Rutschman": 1,
-  "Carter": 2,
-  "Marte": 2
+  "Piazza": 1
 }
 ===========================================
+🏃 Piazza scores and removed from base
 📌 타석 분석됨:
-👤 타자: Neto
+👤 타자: Hernandez
 📄 로그: [
-  "Neto hit a sacrifice fly to Harper (SF9)",
-  "Marte scores"
+  "Hernandez hit a sacrifice fly to Carroll (SF8)",
+  "Piazza scores"
 ]
 🏷️ 결과: sacrifice fly out
 🎯 RBI: 1
 ⚾ RISP: true
+🕰️ 이닝: 2 (말)
+❌ 아웃카운트: 0
 🚦 주자상태: {
-  "Rutschman": 1,
-  "Carter": 2,
-  "Marte": 3
+  "Piazza": 3,
+  "Kurtz": 1
 }
 ===========================================
-📌 타석 분석됨:
-👤 타자: Carter
-📄 로그: [
-  "Carter struck out on a slider low and away"
-]
-🏷️ 결과: strikeout
-🎯 RBI: 0
-⚾ RISP: true
-🚦 주자상태: {
-  "Rutschman": 1,
-  "Carter": 2
-}
-===========================================
+🏃 Kurtz scores and removed from base
 📌 타석 분석됨:
 👤 타자: Raines
 📄 로그: [
-  "Raines grounded out to Devers (5-3)"
-]
-🏷️ 결과: out
-🎯 RBI: 0
-⚾ RISP: true
-🚦 주자상태: {
-  "Rutschman": 1,
-  "Carter": 2
-}
-===========================================
-📌 타석 분석됨:
-👤 타자: Rutschman
-📄 로그: [
-  "Rutschman lined to right for a single"
-]
-🏷️ 결과: single
-🎯 RBI: 0
-⚾ RISP: true
-🚦 주자상태: {
-  "Rutschman": 1,
-  "Carter": 2
-}
-===========================================
-📌 타석 분석됨:
-👤 타자: Castro
-📄 로그: [
-  "Castro grounded to left for a single",
-  "Rutschman advances to 2nd"
-]
-🏷️ 결과: single
-🎯 RBI: 0
-⚾ RISP: true
-🚦 주자상태: {
-  "Rutschman": 1,
-  "Carter": 2
-}
-===========================================
-📌 타석 분석됨:
-👤 타자: Santander
-📄 로그: [
-  "Santander homered to right (386 feet)",
-  "Rutschman scores",
-  "Castro scores"
+  "Raines homered to left (421 feet)",
+  "Kurtz scores"
 ]
 🏷️ 결과: home_run
-🎯 RBI: 3
-⚾ RISP: true
+🎯 RBI: 2
+⚾ RISP: false
+🕰️ 이닝: 2 (말)
+❌ 아웃카운트: 1
 🚦 주자상태: {
-  "Rutschman": 2,
-  "Carter": 2,
-  "Castro": 1
+  "Kurtz": 1
 }
 ===========================================
 📌 타석 분석됨:
@@ -413,118 +271,287 @@
 ]
 🏷️ 결과: strikeout
 🎯 RBI: 0
-⚾ RISP: true
-🚦 주자상태: {
-  "Carter": 2
-}
+⚾ RISP: false
+🕰️ 이닝: 2 (말)
+❌ 아웃카운트: 1
+🚦 주자상태: {}
+===========================================
+🛎️ 3아웃 → 이닝 종료, 주자 초기화됨
+📌 타석 분석됨:
+👤 타자: Castro
+📄 로그: [
+  "Castro lined out to Hodges (L3)"
+]
+🏷️ 결과: out
+🎯 RBI: 0
+⚾ RISP: false
+🕰️ 이닝: 2 (말)
+❌ 아웃카운트: 2
+🚦 주자상태: {}
+===========================================
+📌 타석 분석됨:
+👤 타자: Santander
+📄 로그: [
+  "Santander homered to right (399 feet)"
+]
+🏷️ 결과: home_run
+🎯 RBI: 1
+⚾ RISP: false
+🕰️ 이닝: 3 (말)
+❌ 아웃카운트: 0
+🚦 주자상태: {}
+===========================================
+📌 타석 분석됨:
+👤 타자: Dominguez
+📄 로그: [
+  "Dominguez grounded out to Vientos (5-3)"
+]
+🏷️ 결과: out
+🎯 RBI: 0
+⚾ RISP: false
+🕰️ 이닝: 3 (말)
+❌ 아웃카운트: 0
+🚦 주자상태: {}
 ===========================================
 📌 타석 분석됨:
 👤 타자: Marte
 📄 로그: [
-  "Marte lined out to Gelof (L4)"
+  "Marte popped out to Dozier (P4)"
 ]
 🏷️ 결과: out
 🎯 RBI: 0
-⚾ RISP: true
-🚦 주자상태: {
-  "Carter": 2
-}
+⚾ RISP: false
+🕰️ 이닝: 3 (말)
+❌ 아웃카운트: 1
+🚦 주자상태: {}
 ===========================================
+🛎️ 3아웃 → 이닝 종료, 주자 초기화됨
 📌 타석 분석됨:
-👤 타자: Gordon
+👤 타자: Piazza
 📄 로그: [
-  "Gordon reached first on a fielding error by Devers (E5)"
+  "Piazza grounded out to Hodges (3U)"
 ]
-🏷️ 결과: error
+🏷️ 결과: out
 🎯 RBI: 0
-⚾ RISP: true
-🚦 주자상태: {
-  "Carter": 2
-}
+⚾ RISP: false
+🕰️ 이닝: 3 (말)
+❌ 아웃카운트: 2
+🚦 주자상태: {}
 ===========================================
 📌 타석 분석됨:
-👤 타자: Neto
+👤 타자: Kurtz
 📄 로그: [
-  "Neto grounded to right for a single",
-  "Gordon advances to 2nd"
+  "Kurtz grounded out to Dozier (4-3)"
+]
+🏷️ 결과: out
+🎯 RBI: 0
+⚾ RISP: false
+🕰️ 이닝: 4 (말)
+❌ 아웃카운트: 0
+🚦 주자상태: {}
+===========================================
+📌 타석 분석됨:
+👤 타자: Hernandez
+📄 로그: [
+  "Hernandez grounded to center for a single"
 ]
 🏷️ 결과: single
 🎯 RBI: 0
-⚾ RISP: true
-🚦 주자상태: {
-  "Carter": 2
-}
-===========================================
-📌 타석 분석됨:
-👤 타자: Carter
-📄 로그: [
-  "Carter sacrificed to Leiter (1-3 SH)",
-  "Gordon advances to 3rd",
-  "Neto advances to 2nd"
-]
-🏷️ 결과: sacrifice out
-🎯 RBI: 0
-⚾ RISP: true
-🚦 주자상태: {
-  "Carter": 2,
-  "Gordon": 2,
-  "Neto": 1
-}
+⚾ RISP: false
+🕰️ 이닝: 4 (말)
+❌ 아웃카운트: 1
+🚦 주자상태: {}
 ===========================================
 📌 타석 분석됨:
 👤 타자: Raines
 📄 로그: [
-  "Raines walked"
+  "Raines lined out to Carter (L7)"
 ]
-🏷️ 결과: walk
+🏷️ 결과: out
 🎯 RBI: 0
-⚾ RISP: true
+⚾ RISP: false
+🕰️ 이닝: 4 (말)
+❌ 아웃카운트: 1
 🚦 주자상태: {
-  "Carter": 2,
-  "Gordon": 3,
-  "Neto": 2
+  "Hernandez": 1
 }
 ===========================================
 📌 타석 분석됨:
-👤 타자: Rutschman
+👤 타자: Roberts
 📄 로그: [
-  "Rutschman grounded out to Gelof on a deflected hit (4-3)",
-  "Gordon scores",
-  "Neto advances to 3rd",
-  "Raines advances to 2nd"
+  "Roberts walked"
+]
+🏷️ 결과: walk
+🎯 RBI: 0
+⚾ RISP: false
+🕰️ 이닝: 4 (말)
+❌ 아웃카운트: 2
+🚦 주자상태: {
+  "Hernandez": 1
+}
+===========================================
+➡️ Hernandez advances to base 3
+➡️ Roberts advances to base 2
+📌 타석 분석됨:
+👤 타자: Castro
+📄 로그: [
+  "Castro lined to left for a single",
+  "Hernandez advances to 3rd",
+  "Roberts advances to 2nd"
+]
+🏷️ 결과: single
+🎯 RBI: 0
+⚾ RISP: false
+🕰️ 이닝: 4 (말)
+❌ 아웃카운트: 2
+🚦 주자상태: {
+  "Hernandez": 1,
+  "Roberts": 1
+}
+===========================================
+🛎️ 3아웃 → 이닝 종료, 주자 초기화됨
+📌 타석 분석됨:
+👤 타자: Santander
+📄 로그: [
+  "Santander flied out to Carroll (F8)"
+]
+🏷️ 결과: out
+🎯 RBI: 0
+⚾ RISP: true
+🕰️ 이닝: 4 (말)
+❌ 아웃카운트: 2
+🚦 주자상태: {
+  "Hernandez": 3,
+  "Roberts": 2,
+  "Castro": 1
+}
+===========================================
+📌 타석 분석됨:
+👤 타자: Dominguez
+📄 로그: [
+  "Dominguez grounded out to Smith (6-3)"
+]
+🏷️ 결과: out
+🎯 RBI: 0
+⚾ RISP: false
+🕰️ 이닝: 5 (말)
+❌ 아웃카운트: 0
+🚦 주자상태: {}
+===========================================
+📌 타석 분석됨:
+👤 타자: Marte
+📄 로그: [
+  "Marte doubled to right"
+]
+🏷️ 결과: double
+🎯 RBI: 0
+⚾ RISP: false
+🕰️ 이닝: 5 (말)
+❌ 아웃카운트: 1
+🚦 주자상태: {}
+===========================================
+📌 타석 분석됨:
+👤 타자: Piazza
+📄 로그: [
+  "Piazza struck out swinging late at an inside sinker"
+]
+🏷️ 결과: strikeout
+🎯 RBI: 0
+⚾ RISP: true
+🕰️ 이닝: 5 (말)
+❌ 아웃카운트: 1
+🚦 주자상태: {
+  "Marte": 2
+}
+===========================================
+🛎️ 3아웃 → 이닝 종료, 주자 초기화됨
+📌 타석 분석됨:
+👤 타자: Kurtz
+📄 로그: [
+  "Kurtz flied out to Carter (F7)"
+]
+🏷️ 결과: out
+🎯 RBI: 0
+⚾ RISP: true
+🕰️ 이닝: 5 (말)
+❌ 아웃카운트: 2
+🚦 주자상태: {
+  "Marte": 2
+}
+===========================================
+📌 타석 분석됨:
+👤 타자: Hernandez
+📄 로그: [
+  "Hernandez grounded out to Hodges (3U)"
+]
+🏷️ 결과: out
+🎯 RBI: 0
+⚾ RISP: false
+🕰️ 이닝: 6 (말)
+❌ 아웃카운트: 0
+🚦 주자상태: {}
+===========================================
+📌 타석 분석됨:
+👤 타자: Raines
+📄 로그: [
+  "Raines walked",
+  "Raines stole 2nd",
+  "Raines stole 3rd"
+]
+🏷️ 결과: walk
+🎯 RBI: 0
+⚾ RISP: false
+🕰️ 이닝: 6 (말)
+❌ 아웃카운트: 1
+🚦 주자상태: {}
+===========================================
+🏃 Raines scores and removed from base
+📌 타석 분석됨:
+👤 타자: Roberts
+📄 로그: [
+  "Roberts reached first on fielder's choice (FC)",
+  "Raines scores"
 ]
 🏷️ 결과: out
 🎯 RBI: 1
 ⚾ RISP: true
+🕰️ 이닝: 6 (말)
+❌ 아웃카운트: 1
 🚦 주자상태: {
-  "Carter": 2,
-  "Gordon": 3,
-  "Neto": 2,
-  "Raines": 1
+  "Raines": 3
 }
 ===========================================
 📌 타석 분석됨:
 👤 타자: Castro
 📄 로그: [
-  "Castro hit to center for a single",
-  "Neto scores",
-  "Raines scores",
-  "Castro advances to 3rd"
+  "Castro reached first on fielder's choice (4-6 FC)",
+  "Roberts out"
 ]
-🏷️ 결과: single
-🎯 RBI: 2
-⚾ RISP: true
-🚦 주자상태: {
-  "Carter": 2,
-  "Neto": 3,
-  "Raines": 2
-}
+🏷️ 결과: out
+🎯 RBI: 0
+⚾ RISP: false
+🕰️ 이닝: 6 (말)
+❌ 아웃카운트: 1
+🚦 주자상태: {}
+===========================================
+🛎️ 3아웃 → 이닝 종료, 주자 초기화됨
+📌 타석 분석됨:
+👤 타자: Santander
+📄 로그: [
+  "Santander lined out to Carroll (L8)"
+]
+🏷️ 결과: out
+🎯 RBI: 0
+⚾ RISP: false
+🕰️ 이닝: 6 (말)
+❌ 아웃카운트: 2
+🚦 주자상태: {}
 ===========================================
 🧾 검산 결과: {
-  "expectedHits": 11,
-  "actualHits": 11,
-  "expectedRuns": 10,
-  "actualRuns": 10,
+  "expectedHits": 10,
+  "actualHits": 10,
+  "expectedRuns": 8,
+  "actualRuns": 8,
   "hitsMatch": true,
   "runsMatch": true
 }
