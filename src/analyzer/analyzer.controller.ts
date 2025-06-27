@@ -8,6 +8,7 @@ export class AnalyzerController {
 
   @Post()
   analyzeGame(@Body() body: AnalyzeGameDto) {
-     return this.analyzerService.analyze(body);
+    console.log('body', body);
+    return this.analyzerService.analyze(body);
   }
 }

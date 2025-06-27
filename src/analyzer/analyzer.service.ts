@@ -9,17 +9,35 @@ import {
   Ownership,
   ValidationResult,
 } from './types/analysis-result.interface';
+import { TheShowApiService } from 'src/the-show-api/the-show-api.service';
 
 @Injectable()
 export class AnalyzerService {
-  analyze({ line_score, game_log }: AnalyzeGameDto): AnalysisResult {
-    console.log('🧠 분석 시작');
-    const gameLogLines = Array.isArray(game_log)
-      ? (game_log as string[])
-      : (game_log as string)
-          .split(/\r?\n/)
-          .map((line) => line.trim())
-          .filter(Boolean);
+  constructor(private readonly theShowApiService: TheShowApiService) {}
+
+  async analyze(dto: AnalyzeGameDto): Promise<AnalysisResult> {
+    const { username, gameId } = dto;
+    const { game } = await this.theShowApiService.fetchGameLogFromApi(
+      username,
+      gameId,
+    );
+    const [lineScoreRaw, gameLogRaw] = game;
+
+    const line_score = lineScoreRaw[1];
+    // const game_log = gameLogRaw[1];
+    // const box_score = boxScoreRaw[1];
+
+    const game_log = gameLogRaw[1];
+    // const box_score = boxScoreRaw[1];
+    const gameLog = game_log
+      .replace(/\^c\d+/g, '')
+      .replace(/\^n/g, '\n')
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    console.log('🧠 분석 시작', gameLog);
+    const gameLogLines = gameLog;
 
     console.log('📄 줄 수:', gameLogLines.length);
 
@@ -92,7 +110,7 @@ export class AnalyzerService {
     let inning = 1;
     let isTopInning = true;
 
-    console.log('🎬 parseAtBats 시작');
+    console.log('�� parseAtBats 시작');
 
     for (let i = 0; i < gameLog.length; i++) {
       const line = gameLog[i].trim();
