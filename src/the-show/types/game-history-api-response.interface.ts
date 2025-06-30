@@ -15,6 +15,11 @@ export interface GameHistoryItem {
   home_name: string;
   away_name: string;
   display_date: string;
+  teamName?: string; // 플레이어의 팀 이름
+  isTeamGame?: boolean; // 2:2 게임 여부
+  isUserHost?: boolean; // 사용자가 호스트인지 여부
+  isSingleGame?: boolean; // CPU와의 싱글게임 여부
+  isTeamGameChecking?: boolean; // 2:2 게임 여부 확인 중
 }
 
 export interface GameHistoryApiResponse {
@@ -22,4 +27,15 @@ export interface GameHistoryApiResponse {
   per_page: number;
   total_pages: number;
   game_history: GameHistoryItem[];
+}
+
+// 게임 타입 체크 관련 인터페이스 (단일 게임 처리)
+export interface GameTypeCheckRequest {
+  gameId: string; // 단일 게임 체크
+  teammateUsername: string;
+}
+
+export interface GameTypeCheckResponse {
+  gameId: string;
+  isTeamGame: boolean;
 }
