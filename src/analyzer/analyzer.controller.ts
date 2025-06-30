@@ -8,7 +8,9 @@ export class AnalyzerController {
 
   @Post()
   analyzeGame(@Body() body: AnalyzeGameDto) {
-    console.log('body', body);
+    console.log('🔍 [ANALYZE API 호출]');
+    console.log('📋 요청 시간:', new Date().toISOString());
+    console.log('='.repeat(50));
     return this.analyzerService.analyze(body);
   }
 }

@@ -29,10 +29,34 @@ export interface BatterStats {
   rispAverage: number;
 }
 
+export interface GameMetadata {
+  stadium?: string;
+  elevation?: string;
+  hittingDifficulty?: string;
+  pitchingDifficulty?: string;
+  gameType?: string;
+  attendance?: string;
+  weather?: string;
+  wind?: string;
+  scheduledFirstPitch?: string;
+  umpires?: {
+    hp?: string;
+    first?: string;
+    second?: string;
+    third?: string;
+  };
+}
+
 export interface AnalysisResult {
   myStats: BatterStats;
   friendStats: BatterStats;
   validation: ValidationResult;
+  atBatDetails: AtBatEvent[];
+  ownership: Ownership;
+  gameMetadata: GameMetadata;
+  lineScore: LineScore;
+  homeTeamLogo?: string; // 홈팀 로고 이미지 URL
+  awayTeamLogo?: string; // 원정팀 로고 이미지 URL
 }
 
 export type AtBatResult =
@@ -54,10 +78,12 @@ export interface AtBatEvent {
   rbi?: number;
   description?: string;
   risp?: boolean;
-  runnersBefore?: Map<string, number>;
+  runnersBefore?: Record<string, number>;
+  outsBefore?: number; // 타석 시작 전 아웃카운트
   inning: number;
   isTopInning: boolean;
   log: string[];
+  owner?: 'my' | 'friend';
 }
 
 export interface Ownership {
@@ -74,14 +100,6 @@ export interface ValidationResult {
   actualRuns: number;
 }
 
-export interface ValidationResult {
-  hitsMatch: boolean;
-  runsMatch: boolean;
-  expectedHits: number;
-  actualHits: number;
-  expectedRuns: number;
-  actualRuns: number;
-}
 export interface StatLine {
   atBats: number;
   hits: number;
