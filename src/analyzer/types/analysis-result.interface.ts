@@ -47,7 +47,24 @@ export interface GameMetadata {
   };
 }
 
+export interface TeamAnalysis {
+  hostStats: BatterStats;
+  teammateStats: BatterStats;
+  ownership: Ownership;
+}
+
 export interface AnalysisResult {
+  home: TeamAnalysis;
+  away: TeamAnalysis;
+  validation: { home: ValidationResult; away: ValidationResult };
+  gameMetadata: GameMetadata;
+  lineScore: LineScore;
+  homeTeamLogo?: string;
+  awayTeamLogo?: string;
+}
+
+// 기존 AnalysisResult 구조 (백업용)
+export interface LegacyAnalysisResult {
   myStats: BatterStats;
   friendStats: BatterStats;
   validation: ValidationResult;
@@ -83,12 +100,14 @@ export interface AtBatEvent {
   inning: number;
   isTopInning: boolean;
   log: string[];
-  owner?: 'my' | 'friend';
+  owner?: 'my' | 'friend'; // 호환성을 위해 유지 (deprecated)
+  team?: 'home' | 'away'; // 홈팀/원정팀 구분
+  teamName?: string; // 팀 이름 (예: "Los Angeles Angels")
 }
 
 export interface Ownership {
-  myAtBats: AtBatEvent[];
-  friendAtBats: AtBatEvent[];
+  hostAtBats: AtBatEvent[];
+  teammateAtBats: AtBatEvent[];
 }
 
 export interface ValidationResult {

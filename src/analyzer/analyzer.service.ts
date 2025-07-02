@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AnalyzeGameDto } from './dto/analyze-game.dto';
 import {
-  AnalysisResult,
   AtBatEvent,
   AtBatResult,
   BatterStats,
@@ -11,15 +10,34 @@ import {
   GameMetadata,
 } from './types/analysis-result.interface';
 import { TheShowService } from 'src/the-show/the-show.service';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class AnalyzerService {
+  private readonly logFilePath = path.join(process.cwd(), 'log.txt');
+
   constructor(private readonly theShowApiService: TheShowService) {}
 
-  async analyze(dto: AnalyzeGameDto): Promise<AnalysisResult> {
+  private log(message: string): void {
+    const timestamp = new Date().toISOString();
+    const logMessage = `[${timestamp}] ${message}`;
+
+    // 콘솔에도 출력
+    console.log(message);
+
+    // 파일에도 기록
+    try {
+      fs.appendFileSync(this.logFilePath, logMessage + '\n');
+    } catch (error) {
+      console.error('로그 파일 쓰기 실패:', error);
+    }
+  }
+
+  async analyze(dto: AnalyzeGameDto): Promise<any> {
     const {
       username,
-      teamName,
+      // teamName,
       gameId,
       teammateUsername,
       isTeamGame = false,
@@ -27,9 +45,16 @@ export class AnalyzerService {
       isSingleGame = false,
     } = dto;
 
+    // 분석 시작 로그
+    this.log('🎯 ========== 게임 분석 시작 ==========');
+    this.log(`📝 사용자: ${username}`);
+    this.log(`🎮 게임 ID: ${gameId}`);
+    this.log(`👥 팀 게임: ${isTeamGame ? 'YES' : 'NO'}`);
+    this.log(`🏠 호스트: ${isUserHost ? 'YES' : 'NO'}`);
+
     // CPU와의 싱글게임인 경우 분석 중단
     if (isSingleGame) {
-      console.log(
+      this.log(
         '🤖 CPU와의 싱글게임입니다. 온라인 대전게임이 아니므로 분석하지 않습니다.',
       );
       throw new Error(
@@ -39,9 +64,9 @@ export class AnalyzerService {
 
     const gameType = isTeamGame ? '2:2' : '1:1';
     const hostInfo = isUserHost ? '호스트' : '팀원';
-    console.log(`🎮 게임 타입: ${gameType} | 역할: ${hostInfo}`);
-    console.log(`👥 팀원 닉네임: ${teammateUsername || '없음'}`);
-    console.log(`🤖 싱글게임: ${isSingleGame ? 'YES' : 'NO'}`);
+    this.log(`🎮 게임 타입: ${gameType} | 역할: ${hostInfo}`);
+    this.log(`👥 팀원 닉네임: ${teammateUsername || '없음'}`);
+    this.log(`🤖 싱글게임: ${isSingleGame ? 'YES' : 'NO'}`);
 
     const { game } = await this.theShowApiService.fetchGameLogFromApi(
       username,
@@ -58,42 +83,38 @@ export class AnalyzerService {
       .map((line) => line.trim())
       .filter(Boolean);
 
-    console.log('🧠 분석 시작', gameLog);
+    this.log('🧠 분석 시작');
+    this.log(`📄 게임 로그: ${JSON.stringify(gameLog).substring(0, 100)}...`);
     const gameLogLines = gameLog;
-    console.log('📄 줄 수:', gameLogLines.length);
+    this.log(`📄 줄 수: ${gameLogLines.length}`);
 
-    // 내 팀 구단명은 프론트엔드에서 전달받음
-    const myTeamName = teamName;
+    const homeTeamName = line_score.home_full_name;
+    const awayTeamName = line_score.away_full_name;
 
-    // 상대팀 구단명도 결정
-    let opponentTeamName = '';
-    if (myTeamName) {
-      opponentTeamName =
-        myTeamName === line_score.home_full_name
-          ? line_score.away_full_name
-          : line_score.home_full_name;
-    }
-
-    console.log(`🏟️ 내 팀 구단명: ${myTeamName || '구단명 미확인'}`);
-    console.log(`🏟️ 상대팀 구단명: ${opponentTeamName || '구단명 미확인'}`);
-
-    if (!myTeamName) {
-      throw new Error(
-        '플레이어의 구단명을 찾을 수 없습니다. 게임 데이터를 확인해주세요.',
-      );
-    }
+    this.log(`🏟️ 홈팀 구단명: ${homeTeamName || '구단명 미확인'}`);
+    this.log(`🏟️ 어웨이팀 구단명: ${awayTeamName || '구단명 미확인'}`);
 
     const rawAtBats = this.parseAtBats(
       gameLogLines,
-      myTeamName,
-      opponentTeamName,
+      homeTeamName,
+      awayTeamName,
     );
     const runnerMap = new Map<string, number>();
     let outs = 0;
 
     const atBats: AtBatEvent[] = [];
 
-    for (const raw of rawAtBats) {
+    // 홈팀과 어웨이팀 타석을 이닝 순서대로 합쳐서 처리
+    const allRawAtBats = [...rawAtBats.home, ...rawAtBats.away].sort((a, b) => {
+      if (a.inning !== b.inning) return a.inning - b.inning;
+      return a.isTopInning === b.isTopInning ? 0 : a.isTopInning ? -1 : 1;
+    });
+
+    this.log(
+      `📊 총 파싱된 타석 수: 홈팀 ${rawAtBats.home.length}개, 어웨이팀 ${rawAtBats.away.length}개, 총 ${allRawAtBats.length}개`,
+    );
+
+    for (const raw of allRawAtBats) {
       const analyzed = this.analyzeAtBat(
         raw.batter,
         raw.log,
@@ -116,85 +137,82 @@ export class AnalyzerService {
 
       const combined = { ...raw, ...analyzed, outsBefore };
 
-      console.log(`📌 타석 분석됨:`);
-      console.log(`👤 타자: ${combined.batter}`);
-      console.log(`📄 로그:`, combined.log);
-      console.log(`🏷️ 결과: ${combined.result}`);
-      console.log(`🎯 RBI: ${combined.rbi}`);
-      console.log(`⚾ RISP: ${combined.risp}`);
-      console.log(`🕰️ 이닝: ${raw.inning} (${raw.isTopInning ? '초' : '말'})`);
-      console.log(`❌ 아웃카운트: ${outsBefore}`);
-      console.log(`🚦 주자상태:`, combined.runnersBefore || {});
-      console.log(`===========================================`);
+      this.log(`📌 타석 분석됨:`);
+      this.log(`👤 타자: ${combined.batter}`);
+      this.log(`📄 로그: ${JSON.stringify(combined.log)}`);
+      this.log(`🏷️ 결과: ${combined.result}`);
+      this.log(`🎯 RBI: ${combined.rbi}`);
+      this.log(`⚾ RISP: ${combined.risp}`);
+      this.log(`🕰️ 이닝: ${raw.inning} (${raw.isTopInning ? '초' : '말'})`);
+      this.log(`❌ 아웃카운트: ${outsBefore}`);
+      this.log(`🚦 주자상태: ${JSON.stringify(combined.runnersBefore || {})}`);
+      this.log(`===========================================`);
 
       atBats.push(combined);
     }
 
-    // 2단계: 게임 타입에 따른 소유권 배정
-    let ownership: Ownership;
-    if (isTeamGame) {
-      // 2:2 게임 - 새로운 로직 사용
-      ownership = this.assignBatterOwnership(
-        atBats,
-        dto.teamSide,
-        line_score,
-        username,
-        teammateUsername,
-        isUserHost,
-      );
+    // 2단계: 홈팀과 어웨이팀 각각 분석
+    const homeAtBats = atBats.filter((atBat) => !atBat.isTopInning);
+    const awayAtBats = atBats.filter((atBat) => atBat.isTopInning);
+
+    this.log(`📊 홈팀 타석 수: ${homeAtBats.length}개`);
+    this.log(`📊 어웨이팀 타석 수: ${awayAtBats.length}개`);
+
+    // 우리팀이 홈팀인지 어웨이팀인지 판단
+    let isMyTeamHome = false;
+    if (dto.teamSide) {
+      isMyTeamHome = dto.teamSide === 'home';
     } else {
-      // 1:1 게임 - 기존 방식 사용
-      ownership = this.assignBatterOwnership(atBats);
-      // console.log(`🔄 1:1 게임으로 분석됨 - 기존 방식 사용`);
-    }
-
-    // 각 타석에 소유권 정보 추가
-    const atBatsWithOwnership = atBats.map((atBat) => ({
-      ...atBat,
-      owner: ownership.myAtBats.includes(atBat)
-        ? ('my' as const)
-        : ('friend' as const),
-    }));
-
-    const myStats = this.aggregateStats(ownership.myAtBats);
-    const friendStats = this.aggregateStats(ownership.friendAtBats);
-    // teammateUsername을 이용해 감지된 팀 정보를 validation에도 사용
-    let detectedTeamSide = dto.teamSide;
-    if (teammateUsername && line_score && username) {
       const cleanUsername = username.replace(/\s*\^b\d+\^\s*$/, '').trim();
-      const cleanTeammateUsername = teammateUsername
-        .replace(/\s*\^b\d+\^\s*$/, '')
-        .trim();
       const cleanHomeName = line_score.home_name
         ?.replace(/\s*\^b\d+\^\s*$/, '')
         .trim();
-      const cleanAwayName = line_score.away_name
-        ?.replace(/\s*\^b\d+\^\s*$/, '')
-        .trim();
-
-      const isUsernameHome = cleanHomeName === cleanUsername;
-      const isTeammateHome = cleanHomeName === cleanTeammateUsername;
-      const isUsernameAway = cleanAwayName === cleanUsername;
-      const isTeammateAway = cleanAwayName === cleanTeammateUsername;
-
-      if (isUsernameHome && isTeammateHome) {
-        detectedTeamSide = 'home';
-      } else if (isUsernameAway && isTeammateAway) {
-        detectedTeamSide = 'away';
-      }
+      isMyTeamHome = cleanHomeName === cleanUsername;
     }
 
+    this.log(`🏠 우리팀 판단: ${isMyTeamHome ? '홈팀' : '어웨이팀'}`);
+
+    // 홈팀 분석
+    const homeAnalysis = this.analyzeTeam(
+      homeAtBats,
+      isMyTeamHome,
+      // isTeamGame,
+      // dto,
+      // line_score,
+      // username,
+      // teammateUsername,
+      // isUserHost,
+    );
+
+    // 어웨이팀 분석
+    const awayAnalysis = this.analyzeTeam(
+      awayAtBats,
+      !isMyTeamHome,
+      // isTeamGame,
+      // dto,
+      // line_score,
+      // username,
+      // teammateUsername,
+      // isUserHost,
+    );
+    // 홈팀과 어웨이팀 검증
     const validation = this.validateWithLineScore(
       line_score,
-      myStats,
-      friendStats,
-      detectedTeamSide,
-      myTeamName,
+      homeAnalysis.hostStats,
+      homeAnalysis.teammateStats,
+      awayAnalysis.hostStats,
+      awayAnalysis.teammateStats,
     );
 
     const gameMetadata = this.parseGameMetadata(gameLogLines);
 
-    // console.log(`🧾 검산 결과:`, validation);
+    this.log('🧾 검산 결과:');
+    this.log(
+      `🏠 홈팀 - 안타: ${validation.home.actualHits}/${validation.home.expectedHits} ${validation.home.hitsMatch ? '✅' : '❌'}, 득점: ${validation.home.actualRuns}/${validation.home.expectedRuns} ${validation.home.runsMatch ? '✅' : '❌'}`,
+    );
+    this.log(
+      `✈️ 어웨이팀 - 안타: ${validation.away.actualHits}/${validation.away.expectedHits} ${validation.away.hitsMatch ? '✅' : '❌'}, 득점: ${validation.away.actualRuns}/${validation.away.expectedRuns} ${validation.away.runsMatch ? '✅' : '❌'}`,
+    );
 
     // 홈팀과 원정팀 로고 가져오기
     const cleanHomeName = line_score.home_name
@@ -212,16 +230,12 @@ export class AnalyzerService {
     let awayTeamLogo: string | undefined;
 
     try {
-      console.log('🖼️ 팀 로고 가져오는 중...');
-      console.log(
-        '- 홈팀:',
-        homePlayerName,
-        cleanHomeName ? '' : '(username 사용)',
+      this.log('🖼️ 팀 로고 가져오는 중...');
+      this.log(
+        `- 홈팀: ${homePlayerName} ${cleanHomeName ? '' : '(username 사용)'}`,
       );
-      console.log(
-        '- 원정팀:',
-        awayPlayerName,
-        cleanAwayName ? '' : '(username 사용)',
+      this.log(
+        `- 원정팀: ${awayPlayerName} ${cleanAwayName ? '' : '(username 사용)'}`,
       );
 
       const [homeTeamInfo, awayTeamInfo] = await Promise.all([
@@ -232,20 +246,28 @@ export class AnalyzerService {
       homeTeamLogo = homeTeamInfo?.iconImageUrl || undefined;
       awayTeamLogo = awayTeamInfo?.iconImageUrl || undefined;
 
-      console.log('✅ 로고 가져오기 완료');
-      console.log('- 홈팀 로고:', homeTeamLogo ? '✅' : '❌');
-      console.log('- 원정팀 로고:', awayTeamLogo ? '✅' : '❌');
+      this.log('✅ 로고 가져오기 완료');
+      this.log(`- 홈팀 로고: ${homeTeamLogo ? '✅' : '❌'}`);
+      this.log(`- 원정팀 로고: ${awayTeamLogo ? '✅' : '❌'}`);
     } catch (error) {
       console.error('⚠️ 팀 로고 가져오기 실패:', error);
       // 로고 가져오기 실패해도 분석은 계속 진행
     }
 
+    // 분석 완료 로그
+    this.log('✅ ========== 게임 분석 완료 ==========');
+    this.log(
+      `📊 홈팀 총 타석: ${homeAnalysis.hostStats.atBats + homeAnalysis.teammateStats.atBats}개`,
+    );
+    this.log(
+      `📊 어웨이팀 총 타석: ${awayAnalysis.hostStats.atBats + awayAnalysis.teammateStats.atBats}개`,
+    );
+    this.log('==========================================');
+
     return {
-      myStats,
-      friendStats,
-      validation,
-      atBatDetails: atBatsWithOwnership, // 모든 타석별 상세 데이터
-      ownership, // 소유권별로 분리된 데이터
+      home: homeAnalysis,
+      away: awayAnalysis,
+      validation, // 홈팀과 어웨이팀 검증 결과
       gameMetadata, // 경기 메타데이터
       lineScore: line_score, // 경기 결과 정보
       homeTeamLogo, // 홈팀 로고 이미지 URL
@@ -253,22 +275,64 @@ export class AnalyzerService {
     };
   }
 
+  private analyzeTeam(
+    teamAtBats: AtBatEvent[],
+    isMyTeam: boolean,
+    // isTeamGame: boolean,
+    // dto: AnalyzeGameDto,
+    // lineScore: any,
+    // username: string,
+    // teammateUsername?: string,
+    // isUserHost?: boolean,
+  ) {
+    const ownership = this.assignBatterOwnership(teamAtBats);
+
+    const hostStats = this.aggregateStats(ownership.hostAtBats);
+    const teammateStats = this.aggregateStats(ownership.teammateAtBats);
+
+    this.log(
+      `📊 팀 분석 완료 (${isMyTeam ? '우리팀' : '상대팀'}): 타석 ${teamAtBats.length}개`,
+    );
+
+    // 소유권 정보 로그 출력
+    this.log(`🎯 소유권 분배:`);
+    this.log(`👑 호스트 타석: ${ownership.hostAtBats.length}개`);
+    for (const atBat of ownership.hostAtBats) {
+      this.log(
+        `  - ${atBat.inning}회 ${atBat.isTopInning ? '초' : '말'}: ${atBat.batter} (${atBat.result || 'unknown'})`,
+      );
+    }
+    this.log(`👥 팀원 타석: ${ownership.teammateAtBats.length}개`);
+    for (const atBat of ownership.teammateAtBats) {
+      this.log(
+        `  - ${atBat.inning}회 ${atBat.isTopInning ? '초' : '말'}: ${atBat.batter} (${atBat.result || 'unknown'})`,
+      );
+    }
+    this.log(`===========================================`);
+
+    return {
+      hostStats,
+      teammateStats,
+      ownership,
+    };
+  }
+
   private parseAtBats(
     gameLog: string[],
-    myTeamName?: string,
-    opponentTeamName?: string,
-  ): AtBatEvent[] {
-    const atBats: AtBatEvent[] = [];
+    homeTeamName?: string,
+    awayTeamName?: string,
+  ): { home: AtBatEvent[]; away: AtBatEvent[] } {
+    const atBats: { home: AtBatEvent[]; away: AtBatEvent[] } = {
+      home: [],
+      away: [],
+    };
     let inning = 1;
     let isTopInning = true;
-
-    // console.log('�� parseAtBats 시작');
 
     for (let i = 0; i < gameLog.length; i++) {
       const line = gameLog[i].trim();
 
       if (line.includes('Game Log Legend')) {
-        // console.log('🛑 Game Log Legend 줄 스킵');
         break;
       }
 
@@ -276,15 +340,24 @@ export class AnalyzerService {
         const match = line.match(/Inning (\d+):/);
         if (match) {
           inning = parseInt(match[1], 10);
-          // console.log(`🕰️ 이닝 갱신: ${inning}회`);
         }
       }
 
-      // 내 팀 공격 시작
-      const teamBattingPattern = `${myTeamName} batting.`;
-      if (line.includes(teamBattingPattern)) {
-        isTopInning = false;
-        // console.log(`🎯 ${myTeamName} 공격 시작: ${line}`);
+      // 현재 라인에서 batting 패턴 확인
+      const battingRegex = /^\^([A-Za-z\s]+) batting\./;
+      const match = line.match(battingRegex);
+
+      if (match) {
+        const teamName = match[1].trim();
+        const isAwayTeam = teamName === awayTeamName;
+
+        if (isAwayTeam) {
+          this.log(`🟢 어웨이 팀(${teamName}) 공격 시작`);
+          isTopInning = true;
+        } else {
+          this.log(`🔴 홈 팀(${homeTeamName}) 공격 시작`);
+          isTopInning = false;
+        }
 
         const sentences = line
           .replace(/^.*?batting\./, '')
@@ -295,90 +368,69 @@ export class AnalyzerService {
         let currentAtBat: AtBatEvent | null = null;
 
         for (const sentence of sentences) {
-          const cleaned = sentence
-            .replace(/^\^*[^A-Za-z0-9]*\s*/, '') // ^, *, 공백류 모두 제거
-            .trim();
+          const cleaned = sentence.replace(/^\^*[^A-Za-z0-9]*\s*/, '').trim();
 
           if (
-            /pitching\.?$/i.test(cleaned) || // .으로 끝나거나 안 끝나거나
+            /pitching\.?$/i.test(cleaned) ||
             /pinch hit for/i.test(cleaned) ||
-            /^Game Log Legend/i.test(cleaned)
+            /^Game Log Legend/i.test(cleaned) ||
+            /^Runs:/i.test(cleaned)
           ) {
-            // console.log(`🚫 타석 아님(제외): ${cleaned}`);
             continue;
           }
 
-          const match = cleaned.match(
-            /^([A-Za-z\s\-'.]+?)\s+(?:grounded out|lined out|flied out|popped out|struck out|was called out|struck|lined|grounded|flied|popped|walked|hit|reached|homered|sacrificed|was called|doubled|tripled|singled|bunted|hit by|was hit by|pinch hit)/i,
+          // 타자 이름으로 시작하는 새로운 타석인지 확인
+          const batterMatch = cleaned.match(
+            /^([A-Za-z\s\-'.]+?)\s+(?:grounded out|lined out|flied out|popped out|struck out|was called out|struck|lined|grounded|flied|popped|walked|hit|reached|homered|sacrificed|was called|doubled|tripled|singled|bunted|hit by|was hit by|pinch hit|chopped)/i,
           );
 
-          if (match) {
+          if (batterMatch) {
+            // 이전 타석이 있으면 저장
             if (currentAtBat) {
-              atBats.push(currentAtBat);
-              // console.log(
-              //   `🆕 타석 추가됨: ${currentAtBat.batter} →`,
-              //   currentAtBat.log,
-              // );
+              if (isAwayTeam) {
+                atBats.away.push(currentAtBat);
+              } else {
+                atBats.home.push(currentAtBat);
+              }
+              this.log(
+                `🆕 ${isAwayTeam ? '어웨이' : '홈'} 타석 완료: ${currentAtBat.batter} → ${JSON.stringify(currentAtBat.log)}`,
+              );
             }
+
+            // 새로운 타석 시작
+            const batterName = batterMatch[1].trim();
             currentAtBat = {
-              batter: match[1].trim(),
+              batter: batterName,
               inning,
               isTopInning,
               log: [cleaned],
             };
-          } else if (sentence.startsWith('^') && currentAtBat) {
-            if (/^[A-Za-z\s\-'.]+ stole (2nd|3rd|home)/i.test(cleaned)) {
-              currentAtBat.log.push(cleaned);
-              continue;
-            }
-
-            // ^로 시작했는데 매치 안 되는 경우: 이전 타석 종료 + 새로운 타석 시작 가능성
-            atBats.push(currentAtBat);
-            // console.log(
-            //   `🆕 타석 추가됨(강제 분리): ${currentAtBat.batter} →`,
-            //   currentAtBat.log,
-            // );
-
-            const forcedMatch = cleaned.match(
-              /^\*?\s*\^*\s*([A-Za-z\s\-'.]+)\s+(lined|grounded|flied|popped|struck|walked|hit|reached|homered|sacrificed|was called|doubled|tripled|singled|bunted|hit by)/i,
+            this.log(
+              `🆕 ${isAwayTeam ? '어웨이' : '홈'} 타석 시작: ${batterName} → ${cleaned}`,
             );
-            const forcedName = forcedMatch ? forcedMatch[1].trim() : 'Unknown';
-
-            currentAtBat = {
-              batter: forcedName,
-              inning,
-              isTopInning,
-              log: [cleaned],
-            };
           } else if (currentAtBat) {
+            // 진루, 도루, 득점 등 현재 타석에 추가
             currentAtBat.log.push(cleaned);
+            this.log(
+              `📝 ${isAwayTeam ? '어웨이' : '홈'} 타석 추가: ${currentAtBat.batter} ← ${cleaned}`,
+            );
           }
         }
 
-        if (
-          currentAtBat &&
-          currentAtBat.log.every((line) => line.trim() === '')
-        ) {
-          // console.log('🗑️ 마지막 빈 타석 제거');
-        } else if (currentAtBat) {
-          atBats.push(currentAtBat);
-          // console.log(
-          //   `🆕 마지막 타석 추가됨: ${currentAtBat.batter} →`,
-          //   currentAtBat.log,
-          // );
+        // 마지막 타석 저장
+        if (currentAtBat) {
+          if (isAwayTeam) {
+            atBats.away.push(currentAtBat);
+          } else {
+            atBats.home.push(currentAtBat);
+          }
+          this.log(
+            `🆕 ${isAwayTeam ? '어웨이' : '홈'} 타석 완료(마지막): ${currentAtBat.batter} → ${JSON.stringify(currentAtBat.log)}`,
+          );
         }
-      }
-
-      // 상대팀 공격 시작
-      const opponentBattingPattern = `${opponentTeamName} batting.`;
-      if (line.includes(opponentBattingPattern)) {
-        isTopInning = true;
-        // console.log(`🎯 상대팀 ${opponentTeamName} 공격 시작: ${line}`);
-        continue;
       }
     }
 
-    // console.log(`📊 총 타석 수: ${atBats.length}`);
     return atBats;
   }
 
@@ -514,6 +566,7 @@ export class AnalyzerService {
       (description.includes('hit to') && description.includes('for a single'))
     )
       return 'single';
+    if (description.includes('chopped to')) return 'single';
     if (description.includes('walked')) return 'walk';
     if (description.includes('hit by a pitch')) return 'walk';
     if (description.includes('strikes')) return 'strikeout';
@@ -540,136 +593,28 @@ export class AnalyzerService {
     return 4;
   }
 
-  private assignBatterOwnership(
-    atBats: AtBatEvent[],
-    teamSide?: 'home' | 'away',
-    lineScore?: LineScore,
-    username?: string,
-    teammateUsername?: string,
-    isUserHostParam?: boolean,
-  ): Ownership {
-    const myAtBats: AtBatEvent[] = [];
-    const friendAtBats: AtBatEvent[] = [];
+  private assignBatterOwnership(atBats: AtBatEvent[]): Ownership {
+    const hostAtBats: AtBatEvent[] = [];
+    const teammateAtBats: AtBatEvent[] = [];
 
-    // teammateUsername을 이용해 팀 구분 시도
-    let determinedTeamSide = teamSide;
-    if (teammateUsername && lineScore && username) {
-      const cleanUsername = username.replace(/\s*\^b\d+\^\s*$/, '').trim();
-      const cleanTeammateUsername = teammateUsername
-        .replace(/\s*\^b\d+\^\s*$/, '')
-        .trim();
-      const cleanHomeName = lineScore.home_name
-        ?.replace(/\s*\^b\d+\^\s*$/, '')
-        .trim();
-      const cleanAwayName = lineScore.away_name
-        ?.replace(/\s*\^b\d+\^\s*$/, '')
-        .trim();
-
-      console.log(`🔍 팀 자동 감지 시도:`);
-      console.log(
-        `   사용자: "${cleanUsername}" | 팀원: "${cleanTeammateUsername}"`,
-      );
-      console.log(`   홈팀: "${cleanHomeName}" | 어웨이팀: "${cleanAwayName}"`);
-
-      // 내 닉네임과 팀원 닉네임이 같은 팀인지 확인
-      const isUsernameHome = cleanHomeName === cleanUsername;
-      const isTeammateHome = cleanHomeName === cleanTeammateUsername;
-      const isUsernameAway = cleanAwayName === cleanUsername;
-      const isTeammateAway = cleanAwayName === cleanTeammateUsername;
-
-      if (isUsernameHome && isTeammateHome) {
-        // 둘 다 홈팀 - 정상적인 2:2 게임
-        determinedTeamSide = 'home';
-        console.log(
-          `🏠 자동 감지: 홈팀 (${cleanUsername}, ${cleanTeammateUsername})`,
-        );
-      } else if (isUsernameAway && isTeammateAway) {
-        // 둘 다 어웨이팀 - 정상적인 2:2 게임
-        determinedTeamSide = 'away';
-        console.log(
-          `✈️ 자동 감지: 어웨이팀 (${cleanUsername}, ${cleanTeammateUsername})`,
-        );
-      } else if (
-        (isUsernameHome && isTeammateAway) ||
-        (isUsernameAway && isTeammateHome)
-      ) {
-        // 서로 다른 팀에 있음 - 이상함
-        console.log(
-          '⚠️ 사용자와 팀원이 서로 다른 팀에 있습니다. 1:1 게임이거나 팀원 정보가 잘못되었을 수 있습니다.',
-        );
-      } else {
-        console.log(
-          '⚠️ 닉네임으로 팀을 자동 감지할 수 없습니다. 기존 방식 사용.',
-        );
-      }
-    }
-
-    // determinedTeamSide가 여전히 없으면 기존 방식으로 폴백
-    if (!determinedTeamSide || !lineScore) {
-      let isMyTurn = true;
-      let turnCount = 0;
-
-      for (const atBat of atBats) {
-        const owner = isMyTurn ? myAtBats : friendAtBats;
-        owner.push(atBat);
-        turnCount++;
-
-        if (turnCount % 9 === 0) {
-          isMyTurn = !isMyTurn;
-        } else {
-          isMyTurn = !isMyTurn;
-        }
-      }
-
-      return { myAtBats, friendAtBats };
-    }
-
-    // determinedTeamSide 정보를 기반으로 정확한 ownership 할당
-    const myTeamName =
-      determinedTeamSide === 'home'
-        ? lineScore.home_full_name
-        : lineScore.away_full_name;
-
-    // 호스트 정보 사용 (이미 analyze에서 판단됨)
-    const isUserHost = isUserHostParam ?? false;
-    if (isUserHost) {
-      console.log(`🎮 호스트: ${username} (첫 타석 소유권)`);
-    } else if (teammateUsername) {
-      console.log(`🎮 호스트: ${teammateUsername} (첫 타석 소유권)`);
-    }
-
-    // 호스트 정보를 기반으로 타석 배정
-    const isMyTeamHome = determinedTeamSide === 'home';
-    let teamAtBatCount = 0; // 우리 팀 타석 카운터
+    let teamAtBatCount = 0;
 
     for (const atBat of atBats) {
-      // 초회(top)는 어웨이팀, 말회(bottom)는 홈팀이 공격
-      const isMyTeamTurn = isMyTeamHome
-        ? !atBat.isTopInning
-        : atBat.isTopInning;
+      const isHostTurn = teamAtBatCount % 2;
 
-      if (isMyTeamTurn) {
-        // 우리 팀 턴일 때: 호스트가 먼저, 팀원이 나중에
-        const isMyTurn = isUserHost
-          ? teamAtBatCount % 2 === 0
-          : teamAtBatCount % 2 === 1;
+      this.log(
+        `     ${teamAtBatCount + 1}번째 타석: ${atBat.inning}회 ${atBat.isTopInning ? '초' : '말'} ${atBat.batter} -> ${isHostTurn ? '호스트' : '팀원'} (count=${teamAtBatCount}, isHostTurn=${isHostTurn})`,
+      );
 
-        if (isMyTurn) {
-          myAtBats.push(atBat);
-        } else {
-          friendAtBats.push(atBat);
-        }
-        teamAtBatCount++;
+      if (isHostTurn) {
+        hostAtBats.push(atBat);
+      } else {
+        teammateAtBats.push(atBat);
       }
-      // 상대 팀 턴일 때는 아무것도 하지 않음 (우리 팀 타석이 아니므로)
+      teamAtBatCount++;
     }
 
-    console.log(`🏠 내 팀: ${myTeamName} (${determinedTeamSide})`);
-    console.log(
-      `📊 내 타석: ${myAtBats.length}개, 팀원 타석: ${friendAtBats.length}개`,
-    );
-
-    return { myAtBats, friendAtBats };
+    return { hostAtBats, teammateAtBats };
   }
 
   private aggregateStats(atBats: AtBatEvent[]): BatterStats {
@@ -744,40 +689,44 @@ export class AnalyzerService {
 
   private validateWithLineScore(
     lineScore: LineScore,
-    myStats: BatterStats,
-    friendStats: BatterStats,
-    teamSide?: 'home' | 'away',
-    myTeamName?: string,
-  ): ValidationResult {
-    // teamSide가 제공된 경우 이를 기반으로 검증, 그렇지 않으면 구단명으로 판단
-    let isMyTeamAway: boolean;
-    if (teamSide) {
-      isMyTeamAway = teamSide === 'away';
-    } else if (myTeamName) {
-      // 구단명으로 판단
-      isMyTeamAway = lineScore.away_full_name === myTeamName;
-    } else {
-      throw new Error(
-        '팀 정보를 확인할 수 없습니다. teamSide 또는 myTeamName이 필요합니다.',
-      );
-    }
+    homeHostStats: BatterStats,
+    homeTeammateStats: BatterStats,
+    awayHostStats: BatterStats,
+    awayTeammateStats: BatterStats,
+  ): { home: ValidationResult; away: ValidationResult } {
+    // 홈팀 검증
+    const homeExpectedHits = parseInt(lineScore.home_hits);
+    const homeExpectedRuns = parseInt(lineScore.home_runs);
+    const homeActualHits = homeHostStats.hits + homeTeammateStats.hits;
+    const homeActualRuns = homeHostStats.rbis + homeTeammateStats.rbis;
 
-    const expectedHits = parseInt(
-      isMyTeamAway ? lineScore.away_hits : lineScore.home_hits,
-    );
-    const expectedRuns = parseInt(
-      isMyTeamAway ? lineScore.away_runs : lineScore.home_runs,
-    );
-    const actualHits = myStats.hits + friendStats.hits;
-    const actualRuns = myStats.rbis + friendStats.rbis;
+    const homeValidation: ValidationResult = {
+      expectedHits: homeExpectedHits,
+      actualHits: homeActualHits,
+      expectedRuns: homeExpectedRuns,
+      actualRuns: homeActualRuns,
+      hitsMatch: homeExpectedHits === homeActualHits,
+      runsMatch: homeExpectedRuns === homeActualRuns,
+    };
+
+    // 어웨이팀 검증
+    const awayExpectedHits = parseInt(lineScore.away_hits);
+    const awayExpectedRuns = parseInt(lineScore.away_runs);
+    const awayActualHits = awayHostStats.hits + awayTeammateStats.hits;
+    const awayActualRuns = awayHostStats.rbis + awayTeammateStats.rbis;
+
+    const awayValidation: ValidationResult = {
+      expectedHits: awayExpectedHits,
+      actualHits: awayActualHits,
+      expectedRuns: awayExpectedRuns,
+      actualRuns: awayActualRuns,
+      hitsMatch: awayExpectedHits === awayActualHits,
+      runsMatch: awayExpectedRuns === awayActualRuns,
+    };
 
     return {
-      expectedHits,
-      actualHits,
-      expectedRuns,
-      actualRuns,
-      hitsMatch: expectedHits === actualHits,
-      runsMatch: expectedRuns === actualRuns,
+      home: homeValidation,
+      away: awayValidation,
     };
   }
 
@@ -866,7 +815,7 @@ export class AnalyzerService {
       };
     }
 
-    console.log('🏟️ 경기 메타데이터 파싱 완료:', metadata);
+    this.log(`🏟️ 경기 메타데이터 파싱 완료: ${JSON.stringify(metadata)}`);
 
     return metadata;
   }
