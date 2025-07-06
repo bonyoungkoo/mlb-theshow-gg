@@ -570,7 +570,9 @@ export class AnalyzerService {
       (description.includes('hit to') && description.includes('for a single'))
     )
       return 'single';
-    if (description.includes('chopped to')) return 'single';
+    if (description.includes('bunted to')) {
+      if (description.includes('single')) return 'single';
+    }
     if (description.includes('walked')) return 'walk';
     if (description.includes('hit by a pitch')) return 'walk';
     if (description.includes('strikes')) return 'strikeout';
