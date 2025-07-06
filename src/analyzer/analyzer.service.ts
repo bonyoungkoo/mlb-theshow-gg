@@ -604,13 +604,13 @@ export class AnalyzerService {
     const hostAtBats: AtBatEvent[] = [];
     const teammateAtBats: AtBatEvent[] = [];
 
-    let teamAtBatCount = 0;
+    let teamAtBatCount = 1;
 
     for (const atBat of atBats) {
       const isHostTurn = teamAtBatCount % 2;
 
       this.log(
-        `     ${teamAtBatCount + 1}번째 타석: ${atBat.inning}회 ${atBat.isTopInning ? '초' : '말'} ${atBat.batter} -> ${isHostTurn ? '호스트' : '팀원'} (count=${teamAtBatCount}, isHostTurn=${isHostTurn})`,
+        `     ${teamAtBatCount}번째 타석: ${atBat.inning}회 ${atBat.isTopInning ? '초' : '말'} ${atBat.batter} -> ${isHostTurn ? '호스트' : '팀원'} (count=${teamAtBatCount}, isHostTurn=${isHostTurn})`,
       );
 
       if (isHostTurn) {
