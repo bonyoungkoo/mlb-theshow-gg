@@ -100,14 +100,15 @@ export interface AtBatEvent {
   inning: number;
   isTopInning: boolean;
   log: string[];
-  owner?: 'my' | 'friend'; // 호환성을 위해 유지 (deprecated)
   team?: 'home' | 'away'; // 홈팀/원정팀 구분
   teamName?: string; // 팀 이름 (예: "Los Angeles Angels")
+  isHost?: boolean;
 }
 
 export interface Ownership {
   hostAtBats: AtBatEvent[];
   teammateAtBats: AtBatEvent[];
+  totalAtBats: AtBatEvent[];
 }
 
 export interface ValidationResult {
@@ -216,4 +217,23 @@ export interface PlayerStat {
   cs: string;
   pos: string;
   // 생략된 필드도 필요에 따라 추가 가능
+}
+
+export interface TeamAnalysis {
+  hostStats: BatterStats;
+  teammateStats: BatterStats;
+  ownership: Ownership;
+}
+
+export interface AnalyzeGameResult {
+  home: TeamAnalysis;
+  away: TeamAnalysis;
+  validation: {
+    home: ValidationResult;
+    away: ValidationResult;
+  };
+  gameMetadata: GameMetadata;
+  lineScore: LineScore;
+  homeTeamLogo?: string;
+  awayTeamLogo?: string;
 }

@@ -8,6 +8,7 @@ import {
   Ownership,
   ValidationResult,
   GameMetadata,
+  AnalyzeGameResult,
 } from './types/analysis-result.interface';
 import { TheShowService } from 'src/the-show/the-show.service';
 import * as fs from 'fs';
@@ -34,7 +35,7 @@ export class AnalyzerService {
     }
   }
 
-  async analyze(dto: AnalyzeGameDto): Promise<any> {
+  async analyze(dto: AnalyzeGameDto): Promise<AnalyzeGameResult> {
     const {
       username,
       // teamName,
@@ -287,6 +288,7 @@ export class AnalyzerService {
   ) {
     const ownership = this.assignBatterOwnership(teamAtBats);
 
+    const totalStats = this.aggregateStats(teamAtBats);
     const hostStats = this.aggregateStats(ownership.hostAtBats);
     const teammateStats = this.aggregateStats(ownership.teammateAtBats);
 
@@ -313,6 +315,7 @@ export class AnalyzerService {
     return {
       hostStats,
       teammateStats,
+      totalStats,
       ownership,
     };
   }
@@ -541,10 +544,11 @@ export class AnalyzerService {
   }
 
   private isRISP(runnerMap: Map<string, number>): boolean {
-    for (const [, base] of runnerMap.entries()) {
-      if (base === 2 || base === 3) return true;
-    }
-    return false;
+    let isRisp = false;
+    runnerMap.forEach((base) => {
+      if (base === 2 || base === 3) isRisp = true;
+    });
+    return isRisp;
   }
 
   private inferResult(description: string): AtBatResult {
@@ -594,6 +598,7 @@ export class AnalyzerService {
   }
 
   private assignBatterOwnership(atBats: AtBatEvent[]): Ownership {
+    const totalAtBats: AtBatEvent[] = [];
     const hostAtBats: AtBatEvent[] = [];
     const teammateAtBats: AtBatEvent[] = [];
 
@@ -607,14 +612,16 @@ export class AnalyzerService {
       );
 
       if (isHostTurn) {
+        totalAtBats.push({ ...atBat, isHost: true });
         hostAtBats.push(atBat);
       } else {
+        totalAtBats.push({ ...atBat, isHost: false });
         teammateAtBats.push(atBat);
       }
       teamAtBatCount++;
     }
 
-    return { hostAtBats, teammateAtBats };
+    return { hostAtBats, teammateAtBats, totalAtBats };
   }
 
   private aggregateStats(atBats: AtBatEvent[]): BatterStats {
