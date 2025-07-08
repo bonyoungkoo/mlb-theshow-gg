@@ -77,6 +77,7 @@ export class AnalyzerService {
 
     const line_score = lineScoreRaw[1];
     const game_log = gameLogRaw[1];
+
     const gameLog = game_log
       .replace(/\^c\d+/g, '')
       .replace(/\^n/g, '\n')
@@ -115,6 +116,11 @@ export class AnalyzerService {
       `📊 총 파싱된 타석 수: 홈팀 ${rawAtBats.home.length}개, 어웨이팀 ${rawAtBats.away.length}개, 총 ${allRawAtBats.length}개`,
     );
 
+    const totalScore = {
+      away: 0,
+      home: 0,
+    };
+
     for (const raw of allRawAtBats) {
       const analyzed = this.analyzeAtBat(
         raw.batter,
@@ -128,7 +134,32 @@ export class AnalyzerService {
         raw.batter,
         runnerMap,
       );
+
+      this.log(`outsThisAB: ${outsThisAB}`);
+
       outs += outsThisAB;
+
+      // const beforeInningScore = {
+      //   away: raw.isTopInning
+      //     ? this.calculateScoreByInning(box_score[1].r, Number(raw.inning - 1))
+      //     : this.calculateScoreByInning(box_score[1].r, Number(raw.inning)),
+      //   home: this.calculateScoreByInning(
+      //     box_score[0].r,
+      //     Number(raw.inning - 1),
+      //   ),
+      // };
+
+      const copiedTotalScore = { ...totalScore };
+
+      this.log(
+        `현재 스코어: ${copiedTotalScore.away} : ${copiedTotalScore.home}`,
+      );
+
+      if (raw.isTopInning) {
+        totalScore.away += analyzed.rbi || 0;
+      } else {
+        totalScore.home += analyzed.rbi || 0;
+      }
 
       if (outs >= 3) {
         outs = 0;
@@ -136,7 +167,12 @@ export class AnalyzerService {
         // console.log('🛎️ 3아웃 → 이닝 종료, 주자 초기화됨');
       }
 
-      const combined = { ...raw, ...analyzed, outsBefore };
+      const combined = {
+        ...raw,
+        ...analyzed,
+        outsBefore,
+        totalScore: copiedTotalScore,
+      };
 
       this.log(`📌 타석 분석됨:`);
       this.log(`👤 타자: ${combined.batter}`);
@@ -274,6 +310,14 @@ export class AnalyzerService {
       homeTeamLogo, // 홈팀 로고 이미지 URL
       awayTeamLogo, // 원정팀 로고 이미지 URL
     };
+  }
+
+  private calculateScoreByInning(scoreString: string, inning: number) {
+    const scores = scoreString.split(',').map(Number);
+    const total = scores
+      .slice(0, inning)
+      .reduce((sum, score) => sum + score, 0);
+    return total;
   }
 
   private analyzeTeam(
@@ -470,6 +514,7 @@ export class AnalyzerService {
 
     for (const line of atBatLog) {
       let isOut = false;
+      let isDoublePlay = false;
       const advanceMatch = line.match(
         /([A-Za-z\-'. ]+) advances to (1st|2nd|3rd|home)/,
       );
@@ -480,6 +525,8 @@ export class AnalyzerService {
       const pinchRunnerMatch = line.match(
         /([A-Za-z\-'. ]+) pinch runs for ([A-Za-z\-'. ]+)/,
       );
+      const hitAndOutMatch = line.match(/(.+) out while (.+)/);
+
       const stealMatch = line.match(/([A-Za-z\-'. ]+) stole (2nd|3rd|home)/);
 
       if (advanceMatch) {
@@ -497,6 +544,13 @@ export class AnalyzerService {
 
       if (outMatch) {
         const name = normalize(outMatch[1]);
+        runnerMap.delete(name);
+        isOut = true;
+        // outsThisAtBat++;
+      }
+
+      if (hitAndOutMatch) {
+        const name = normalize(hitAndOutMatch[1]);
         runnerMap.delete(name);
         isOut = true;
         // outsThisAtBat++;
@@ -526,8 +580,12 @@ export class AnalyzerService {
         line.includes('struck out')
       ) {
         isOut = true;
+      } else if (line.includes('hit into a double play')) {
+        this.log('hit into a double play');
+        isDoublePlay = true;
       }
       if (isOut) outsThisAtBat++;
+      if (isDoublePlay) outsThisAtBat++;
     }
 
     const hitResult = this.inferResult(atBatLog[0]);
@@ -539,6 +597,8 @@ export class AnalyzerService {
       else if (hitResult === 'triple') runnerMap.set(normalizedBatter, 3);
       else if (hitResult === 'walk') runnerMap.set(normalizedBatter, 1);
     }
+
+    this.log(`outsThisAtBat: ${outsThisAtBat}`);
 
     return outsThisAtBat;
   }
@@ -573,6 +633,8 @@ export class AnalyzerService {
     if (description.includes('bunted to')) {
       if (description.includes('single')) return 'single';
     }
+    if (description.includes('hit into a double play')) return 'out';
+    if (description.includes('bunted out to')) return 'out';
     if (description.includes('walked')) return 'walk';
     if (description.includes('hit by a pitch')) return 'walk';
     if (description.includes('strikes')) return 'strikeout';
