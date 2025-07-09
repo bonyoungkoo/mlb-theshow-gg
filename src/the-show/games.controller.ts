@@ -13,8 +13,9 @@ export class GamesController {
   @Get('history')
   async getGameHistory(
     @Query('username') username: string,
+    @Query('page') page?: number,
   ): Promise<GameHistoryApiResponse> {
-    return this.theShowService.fetchGameHistoryFromApi(username);
+    return this.theShowService.fetchGameHistoryFromApi(username, page);
   }
 
   @Post('check-type')

@@ -69,8 +69,9 @@ export class TheShowService {
 
   async fetchGameHistoryFromApi(
     username: string,
+    page?: number,
   ): Promise<GameHistoryApiResponse> {
-    const url = `https://mlb25.theshow.com/apis/game_history.json?username=${username}`;
+    const url = `https://mlb25.theshow.com/apis/game_history.json?username=${username}&page=${page}`;
     const response = await this.httpService.axiosRef.get(url);
     const gameHistoryData = response.data as GameHistoryApiResponse;
 
