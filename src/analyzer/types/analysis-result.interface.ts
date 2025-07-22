@@ -83,10 +83,12 @@ export type AtBatResult =
   | 'home_run'
   | 'walk'
   | 'strikeout'
+  | 'strikeout_reached'
   | 'out'
   | 'sacrifice out'
   | 'sacrifice fly out'
   | 'error'
+  | 'incomplete'
   | 'unknown';
 
 export interface AtBatEvent {
