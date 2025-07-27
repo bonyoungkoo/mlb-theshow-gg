@@ -30,6 +30,7 @@ export class PlayerCard {
   @Prop() throw_hand: string;
   @Prop() weight: string;
   @Prop() height: string;
+  @Prop() height_inch?: number;
   @Prop() born: string;
   @Prop() is_hitter: boolean;
 
