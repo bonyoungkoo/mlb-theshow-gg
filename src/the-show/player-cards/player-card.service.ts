@@ -86,7 +86,7 @@ export class PlayerCardService {
 
     const cards = await this.playerCardModel
       .find()
-      .sort({ ovr: -1 }) // ovr 내림차순
+      .sort({ ovr: -1, uuid: 1 }) // ovr 내림차순
       .skip(skip)
       .limit(limit)
       .lean();
@@ -223,7 +223,7 @@ export class PlayerCardService {
     const total = await this.playerCardModel.countDocuments(query);
 
     const sortOption: Record<string, 1 | -1> = {
-      [sortField]: sortOrder === 'asc' ? 1 : -1,
+      [sortField]: sortOrder === 'asc' ? 1 : -1, uuid: 1
     };
 
     const data = await this.playerCardModel
